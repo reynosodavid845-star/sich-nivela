@@ -1,0 +1,80 @@
+[
+  {
+    "id": 1,
+    "tipo": "salida",
+    "codigo": "COM-02",
+    "obra_origen": "Bodega",
+    "obra_destino": "Z11-009",
+    "responsable": "Erick Santos",
+    "registrado_por": "jpivaral",
+    "fecha_hora": "2026-06-19 06:15",
+    "fecha_registro": "2026-06-19 07:02",
+    "devolucion_esperada": "2026-06-19 17:00",
+    "observaciones": "Registrada tarde: con base en una foto desde la puerta."
+  },
+  {
+    "id": 2,
+    "tipo": "devolucion",
+    "codigo": "COM-02",
+    "obra_origen": "Z11-009",
+    "obra_destino": "Bodega",
+    "responsable": "Erick Santos",
+    "registrado_por": "jpivaral",
+    "fecha_hora": "2026-06-26 16:50",
+    "fecha_registro": "2026-06-26 16:55",
+    "devolucion_esperada": "",
+    "observaciones": "Estado recibido: bueno. Ruido raro en el motor. Queda en revisión."
+  },
+  {
+    "id": 3,
+    "tipo": "salida",
+    "codigo": "NIV-LAS-01",
+    "obra_origen": "Bodega",
+    "obra_destino": "Z11-009",
+    "responsable": "Erick Santos",
+    "registrado_por": "jpivaral",
+    "fecha_hora": "2026-10-13 06:15",
+    "fecha_registro": "2026-10-13 06:10",
+    "devolucion_esperada": "2026-10-13 17:00",
+    "observaciones": ""
+  },
+  {
+    "id": 4,
+    "tipo": "permanencia",
+    "codigo": "NIV-LAS-01",
+    "obra_origen": "Z11-009",
+    "obra_destino": "Z11-009",
+    "responsable": "Ing. Esteban Cifuentes",
+    "registrado_por": "ecifuentes",
+    "fecha_hora": "2026-10-13 16:00",
+    "fecha_registro": "2026-10-13 16:00",
+    "devolucion_esperada": "",
+    "observaciones": "Autorización 1: del 13/10/2026 17:00 al 31/12/2026 17:00. El sitio tiene garita."
+  },
+  {
+    "id": 5,
+    "tipo": "salida",
+    "codigo": "ROT-02",
+    "obra_origen": "Bodega",
+    "obra_destino": "EUC-022",
+    "responsable": "Erick Santos",
+    "registrado_por": "jpivaral",
+    "fecha_hora": "2026-10-14 06:15",
+    "fecha_registro": "2026-10-14 06:05",
+    "devolucion_esperada": "2026-10-14 17:00",
+    "observaciones": ""
+  },
+  {
+    "id": 6,
+    "tipo": "salida",
+    "codigo": "MEZ-01",
+    "obra_origen": "Bodega",
+    "obra_destino": "VN-014",
+    "responsable": "Luis Aguilar",
+    "registrado_por": "jpivaral",
+    "fecha_hora": "2026-10-16 06:15",
+    "fecha_registro": "2026-10-16 06:00",
+    "devolucion_esperada": "2026-10-16 17:00",
+    "observaciones": ""
+  }
+]

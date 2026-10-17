@@ -1,0 +1,20 @@
+flowchart TD
+    A(["Inicio 2.1 Registrar salida<br/>(encargado de bodega)"]) --> B{"¿Hay<br/>disponibles en<br/>bodega?"}
+    B -->|No| B1[/"No hay herramientas<br/>disponibles en bodega"/]
+    B1 --> Z1(["Volver al menú"])
+    B -->|Sí| C[["Seleccionar herramienta<br/>(código, nombre o apodo)"]]
+    C --> C1{"¿Canceló?"}
+    C1 -->|Sí| X1[/"Operación<br/>cancelada"/]
+    X1 --> Z2(["Volver al menú"])
+    C1 -->|No| E{"¿Disponible<br/>y en Bodega?"}
+    E -->|No| E1[/"No se puede registrar la salida:<br/>asignada, dañada, requiere revisión,<br/>en reparación o dada de baja"/]
+    E1 --> Z3(["Volver al menú"])
+    E -->|Sí| F[/"Mostrar obras activas<br/>y leer obra de destino"/]
+    F --> F1{"¿Existe, activa<br/>y no es Bodega?"}
+    F1 -->|No| F2[/"La obra no existe o<br/>no está activa"/]
+    F2 --> F
+    F1 -->|Sí| G[/"Leer responsable<br/>que recibe"/]
+    G --> G1{"¿Vacío?"}
+    G1 -->|Sí| G2[/"Este campo es<br/>obligatorio"/]
+    G2 --> G
+    G1 -->|No| P(("A"))

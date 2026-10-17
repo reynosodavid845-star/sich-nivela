@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block contenido %}
+<section class="tarjeta">
+  <h1>Sin conexión a internet</h1>
+  <p class="alerta aviso" role="status">SICH necesita internet para consultar y registrar
+    herramientas, así todos ven la misma información al mismo tiempo.</p>
+  <p>Mientras tanto:</p>
+  <ul>
+    <li>Anote en papel la herramienta, la obra, el responsable y la hora.</li>
+    <li>Regístrelo en SICH en cuanto vuelva la señal (puede poner la hora real en el formulario).</li>
+  </ul>
+  <button class="boton-grande" type="button" onclick="location.reload()">Volver a intentar</button>
+</section>
+{% endblock %}

@@ -1,0 +1,250 @@
+[
+  {
+    "codigo": "COM-01",
+    "nombre": "Compactadora pequeña",
+    "categoria": "Compactación",
+    "marca": "Wacker Neuson",
+    "estado": "disponible",
+    "apodos": [
+      "bailarina",
+      "rana",
+      "bailarina chiquita"
+    ],
+    "motor_o_cable": true,
+    "ubicacion": "Bodega",
+    "responsable": "",
+    "fecha_salida": "",
+    "devolucion_esperada": "",
+    "observaciones": "",
+    "origen": "Dato de prueba precargado (el Módulo 1 - Catálogo está pendiente)"
+  },
+  {
+    "codigo": "COM-02",
+    "nombre": "Compactadora",
+    "categoria": "Compactación",
+    "marca": "Wacker Neuson",
+    "estado": "requiere revisión",
+    "apodos": [
+      "bailarina grande"
+    ],
+    "motor_o_cable": true,
+    "ubicacion": "Bodega",
+    "responsable": "",
+    "fecha_salida": "",
+    "devolucion_esperada": "",
+    "observaciones": "Regresó el viernes con ruido raro (Julián Pivaral).",
+    "origen": "Dato de prueba precargado (el Módulo 1 - Catálogo está pendiente)"
+  },
+  {
+    "codigo": "ROT-01",
+    "nombre": "Rotomartillo",
+    "categoria": "Perforación",
+    "marca": "Bosch",
+    "estado": "disponible",
+    "apodos": [
+      "roto"
+    ],
+    "motor_o_cable": true,
+    "ubicacion": "Bodega",
+    "responsable": "",
+    "fecha_salida": "",
+    "devolucion_esperada": "",
+    "observaciones": "",
+    "origen": "Dato de prueba precargado (el Módulo 1 - Catálogo está pendiente)"
+  },
+  {
+    "codigo": "ROT-02",
+    "nombre": "Rotomartillo",
+    "categoria": "Perforación",
+    "marca": "Bosch",
+    "estado": "asignada",
+    "apodos": [
+      "roto"
+    ],
+    "motor_o_cable": true,
+    "ubicacion": "EUC-022",
+    "responsable": "Erick Santos",
+    "fecha_salida": "2026-10-14 06:15",
+    "devolucion_esperada": "2026-10-14 17:00",
+    "observaciones": "",
+    "origen": "Dato de prueba precargado (el Módulo 1 - Catálogo está pendiente)"
+  },
+  {
+    "codigo": "ROT-03",
+    "nombre": "Rotomartillo",
+    "categoria": "Perforación",
+    "marca": "DeWalt",
+    "estado": "disponible",
+    "apodos": [
+      "roto"
+    ],
+    "motor_o_cable": true,
+    "ubicacion": "Bodega",
+    "responsable": "",
+    "fecha_salida": "",
+    "devolucion_esperada": "",
+    "observaciones": "",
+    "origen": "Dato de prueba precargado (el Módulo 1 - Catálogo está pendiente)"
+  },
+  {
+    "codigo": "MEZ-01",
+    "nombre": "Mezcladora grande",
+    "categoria": "Mezclado",
+    "marca": "Honda",
+    "estado": "asignada",
+    "apodos": [
+      "trompo",
+      "mezcladora grande"
+    ],
+    "motor_o_cable": true,
+    "ubicacion": "VN-014",
+    "responsable": "Luis Aguilar",
+    "fecha_salida": "2026-10-16 06:15",
+    "devolucion_esperada": "2026-10-16 17:00",
+    "observaciones": "",
+    "origen": "Dato de prueba precargado (el Módulo 1 - Catálogo está pendiente)"
+  },
+  {
+    "codigo": "MEZ-02",
+    "nombre": "Mezcladora pequeña",
+    "categoria": "Mezclado",
+    "marca": "Honda",
+    "estado": "disponible",
+    "apodos": [
+      "trompito"
+    ],
+    "motor_o_cable": true,
+    "ubicacion": "Bodega",
+    "responsable": "",
+    "fecha_salida": "",
+    "devolucion_esperada": "",
+    "observaciones": "",
+    "origen": "Dato de prueba precargado (el Módulo 1 - Catálogo está pendiente)"
+  },
+  {
+    "codigo": "MEZ-03",
+    "nombre": "Mezcladora pequeña",
+    "categoria": "Mezclado",
+    "marca": "Honda",
+    "estado": "disponible",
+    "apodos": [
+      "trompito"
+    ],
+    "motor_o_cable": true,
+    "ubicacion": "Bodega",
+    "responsable": "",
+    "fecha_salida": "",
+    "devolucion_esperada": "",
+    "observaciones": "",
+    "origen": "Dato de prueba precargado (el Módulo 1 - Catálogo está pendiente)"
+  },
+  {
+    "codigo": "VIB-01",
+    "nombre": "Vibrador de concreto",
+    "categoria": "Concreto",
+    "marca": "Makita",
+    "estado": "requiere revisión",
+    "apodos": [
+      "vibrador"
+    ],
+    "motor_o_cable": true,
+    "ubicacion": "Bodega",
+    "responsable": "",
+    "fecha_salida": "",
+    "devolucion_esperada": "",
+    "observaciones": "Tiene cinta en el cable (correo de Pamela Rodas).",
+    "origen": "Dato de prueba precargado (el Módulo 1 - Catálogo está pendiente)"
+  },
+  {
+    "codigo": "NIV-LAS-01",
+    "nombre": "Nivel láser",
+    "categoria": "Medición",
+    "marca": "Bosch",
+    "estado": "asignada",
+    "apodos": [
+      "nivel",
+      "laser"
+    ],
+    "motor_o_cable": false,
+    "ubicacion": "Z11-009",
+    "responsable": "Erick Santos",
+    "fecha_salida": "2026-10-13 06:15",
+    "devolucion_esperada": "2026-10-13 17:00",
+    "observaciones": "",
+    "origen": "Dato de prueba precargado (el Módulo 1 - Catálogo está pendiente)"
+  },
+  {
+    "codigo": "NIV-LAS-02",
+    "nombre": "Nivel láser",
+    "categoria": "Medición",
+    "marca": "Bosch",
+    "estado": "disponible",
+    "apodos": [
+      "nivel",
+      "laser"
+    ],
+    "motor_o_cable": false,
+    "ubicacion": "Bodega",
+    "responsable": "",
+    "fecha_salida": "",
+    "devolucion_esperada": "",
+    "observaciones": "",
+    "origen": "Dato de prueba precargado (el Módulo 1 - Catálogo está pendiente)"
+  },
+  {
+    "codigo": "PUL-03",
+    "nombre": "Cortadora de block",
+    "categoria": "Corte",
+    "marca": "Makita",
+    "estado": "disponible",
+    "apodos": [
+      "cortadora de block",
+      "pulidora grande",
+      "la makita azul",
+      "COR-01"
+    ],
+    "motor_o_cable": true,
+    "ubicacion": "Bodega",
+    "responsable": "",
+    "fecha_salida": "",
+    "devolucion_esperada": "",
+    "observaciones": "En la libreta azul aparece como COR-01 (alias heredado). No sale sin disco de repuesto.",
+    "origen": "Dato de prueba precargado (el Módulo 1 - Catálogo está pendiente)"
+  },
+  {
+    "codigo": "EXT-01",
+    "nombre": "Extensión eléctrica 25 m",
+    "categoria": "Eléctrico",
+    "marca": "Truper",
+    "estado": "disponible",
+    "apodos": [
+      "extension",
+      "extensión amarilla"
+    ],
+    "motor_o_cable": true,
+    "ubicacion": "Bodega",
+    "responsable": "",
+    "fecha_salida": "",
+    "devolucion_esperada": "",
+    "observaciones": "",
+    "origen": "Dato de prueba precargado (el Módulo 1 - Catálogo está pendiente)"
+  },
+  {
+    "codigo": "EXT-02",
+    "nombre": "Extensión eléctrica",
+    "categoria": "Eléctrico",
+    "marca": "Truper",
+    "estado": "dada de baja",
+    "apodos": [
+      "extensión naranja",
+      "extension naranja"
+    ],
+    "motor_o_cable": true,
+    "ubicacion": "Bodega",
+    "responsable": "",
+    "fecha_salida": "",
+    "devolucion_esperada": "",
+    "observaciones": "Memorando 14/02/2026: no usar la extensión naranja.",
+    "origen": "Dato de prueba precargado (el Módulo 1 - Catálogo está pendiente)"
+  }
+]

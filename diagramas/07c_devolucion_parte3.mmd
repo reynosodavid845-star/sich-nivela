@@ -1,0 +1,10 @@
+flowchart TD
+    B(("B")) --> Y["Agregar movimiento devolución;<br/>ubicación = Bodega,<br/>responsable vacío"]
+    Y --> Y1[("Guardar JSON")]
+    Y1 --> Y2[/"Operación exitosa: estado<br/>nuevo; a tiempo o TARDE"/]
+    Y2 --> Q{"¿Recibida<br/>con daño?"}
+    Q -->|No| Z2(["Volver al menú"])
+    Q -->|Sí| Q1{"¿Reportar el<br/>daño ahora?<br/>S/N"}
+    Q1 -->|N| Z3(["Volver al menú"])
+    Q1 -->|S| Q2[["Capturar daño<br/>(proceso de 2.4)"]]
+    Q2 --> Z4(["Volver al menú"])

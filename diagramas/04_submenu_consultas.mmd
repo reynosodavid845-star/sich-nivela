@@ -1,0 +1,28 @@
+flowchart TD
+    A(["Submenú 3: Consultas"]) --> B[/"Mostrar 3.1 a 3.5<br/>con marcas sin permiso /<br/>pendiente y 0 Regresar"/]
+    B --> C[/"Leer opción"/]
+    C --> D{"¿Número<br/>de 0 a 5?"}
+    D -->|No| E[/"Opción no válida,<br/>intente de nuevo"/]
+    E --> C
+    D -->|Sí| F{"¿Opción = 0?"}
+    F -->|Sí| R(["Regresar al<br/>menú principal"])
+    F -->|No| G{"¿El rol tiene<br/>permiso?"}
+    G -->|No| H[/"No tiene permisos<br/>para esta opción"/]
+    G -->|Sí| K{"¿Opción?"}
+    K -->|1| K1[["3.1 Buscar<br/>herramienta<br/>[Implementada]"]]
+    K -->|2| K2[["3.2 Disponibles<br/>[Pendiente<br/>Fase 4]"]]
+    K -->|3| K3[["3.3 Devoluciones<br/>pendientes<br/>[Pendiente Fase 4]"]]
+    K -->|4| K4[["3.4 Por obra<br/>[Pendiente<br/>Fase 4]"]]
+    K -->|5| K5[["3.5 Historial<br/>[Pendiente<br/>Fase 4]"]]
+    K2 --> PE[/"Funcionalidad pendiente<br/>de implementación"/]
+    K3 --> PE
+    K4 --> PE
+    K5 --> PE
+    H --> P[/"Presione Enter para volver al menú"/]
+    K1 --> P
+    PE --> P
+    P --> B
+    classDef hecha fill:#dff0e3,stroke:#1d6b34,color:#0f3d1e
+    classDef pendiente fill:#eeeeee,stroke:#666666,color:#222222
+    class K1 hecha
+    class K2,K3,K4,K5 pendiente

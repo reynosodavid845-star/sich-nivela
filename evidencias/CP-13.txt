@@ -1,0 +1,74 @@
+Caso CP-13 - 2.3 Registrar traslado
+Ejecutado: 16/10/2026 23:15
+----------------------------------------------------------------------
+============================================================
+ SICH - Sistema de Control de Herramientas
+ Nivela Obras Civiles, S.A.
+============================================================
+
+============================================================
+ SICH - INICIAR SESIÓN
+============================================================
+Usuario: ecifuentes
+Contraseña: ************
+
+Bienvenido(a), Ing. Esteban Cifuentes - Residente de obra
+
+============================================================
+ SICH - MENÚ PRINCIPAL   (Ing. Esteban Cifuentes - Residente de obra)
+============================================================
+ 1. Catálogo de herramientas
+ 2. Movimientos de herramientas
+ 3. Consultas y seguimiento
+ 9. Cerrar sesión
+ 0. Salir
+Elija una opción: 2
+
+============================================================
+ 2. MOVIMIENTOS DE HERRAMIENTAS
+============================================================
+ 1. Registrar salida  [sin permiso]
+ 2. Registrar devolución  [sin permiso]
+ 3. Registrar traslado
+ 4. Reportar daño
+ 5. Registrar revisión  [sin permiso]
+ 6. Autorizar permanencia en obra
+ 0. Regresar al menú principal
+Elija una opción: 3
+
+============================================================
+ 2.3 REGISTRAR TRASLADO ENTRE OBRAS
+============================================================
+Herramientas que están en obra:
+  - ROT-02 - Rotomartillo (roto) | ASIGNADA | EUC-022
+  - MEZ-01 - Mezcladora grande (trompo, mezcladora grande) | ASIGNADA | VN-014
+  - NIV-LAS-01 - Nivel láser (nivel, laser) | ASIGNADA | Z11-009
+Escriba código, nombre o apodo (ej. bailarina) o 0 para cancelar: COM-01
+Herramienta encontrada: COM-01 - Compactadora pequeña (bailarina, rana, bailarina chiquita) | DISPONIBLE | Bodega
+No se puede registrar el traslado: COM-01 está en bodega. Para enviarla a una obra use 2.1 Registrar salida.
+
+Presione Enter para volver al menú...
+
+============================================================
+ 2. MOVIMIENTOS DE HERRAMIENTAS
+============================================================
+ 1. Registrar salida  [sin permiso]
+ 2. Registrar devolución  [sin permiso]
+ 3. Registrar traslado
+ 4. Reportar daño
+ 5. Registrar revisión  [sin permiso]
+ 6. Autorizar permanencia en obra
+ 0. Regresar al menú principal
+Elija una opción: 0
+
+============================================================
+ SICH - MENÚ PRINCIPAL   (Ing. Esteban Cifuentes - Residente de obra)
+============================================================
+ 1. Catálogo de herramientas
+ 2. Movimientos de herramientas
+ 3. Consultas y seguimiento
+ 9. Cerrar sesión
+ 0. Salir
+Elija una opción: 0
+
+Gracias por usar SICH. Programa finalizado.

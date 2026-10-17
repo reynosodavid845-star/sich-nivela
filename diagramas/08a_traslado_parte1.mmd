@@ -1,0 +1,17 @@
+flowchart TD
+    A(["Inicio 2.3 Registrar traslado<br/>(residente de obra)"]) --> B{"¿Hay<br/>herramientas<br/>en obra?"}
+    B -->|No| B1[/"No hay herramientas<br/>en obra para trasladar"/]
+    B1 --> Z1(["Volver al menú"])
+    B -->|Sí| B2[/"Mostrar herramientas<br/>que están en obra"/]
+    B2 --> C[["Seleccionar herramienta<br/>(código, nombre o apodo)"]]
+    C --> C1{"¿Canceló?"}
+    C1 -->|Sí| X1[/"Operación<br/>cancelada"/]
+    X1 --> Z2(["Volver al menú"])
+    C1 -->|No| D{"¿Está en<br/>Bodega?"}
+    D -->|Sí| D1[/"Está en bodega: use<br/>2.1 Registrar salida"/]
+    D1 --> Z3(["Volver al menú"])
+    D -->|No| D2{"¿Estado =<br/>asignada?"}
+    D2 -->|No| D3[/"Está dañada u otro estado;<br/>no puede trasladarse"/]
+    D3 --> Z4(["Volver al menú"])
+    D2 -->|Sí| E[/"Mostrar obra de origen<br/>(ubicación actual,<br/>no se escribe)"/]
+    E --> P(("A"))

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block contenido %}
+<h1>Instalar SICH en el teléfono o tablet</h1>
+<p class="suave">SICH se instala como una app: queda con su ícono en la pantalla de inicio,
+  se abre a pantalla completa y no ocupa casi espacio. No hace falta tienda de aplicaciones.</p>
+
+<button id="boton-instalar-grande" class="boton-grande" type="button" hidden>Instalar SICH ahora</button>
+<p id="ya-instalada" class="alerta exito" hidden>SICH ya está instalada en este dispositivo.</p>
+
+<section class="tarjeta">
+  <h2>Android (Chrome)</h2>
+  <ol>
+    <li>Abra esta página en <strong>Chrome</strong>.</li>
+    <li>Toque el botón <strong>Instalar SICH ahora</strong> de arriba, o el menú <strong>⋮</strong> → <strong>Instalar app</strong> (o «Agregar a la pantalla principal»).</li>
+    <li>Confirme con <strong>Instalar</strong>. El ícono azul de SICH aparece en el inicio.</li>
+  </ol>
+</section>
+
+<section class="tarjeta">
+  <h2>iPhone o iPad (Safari)</h2>
+  <ol>
+    <li>Abra esta página en <strong>Safari</strong>.</li>
+    <li>Toque <strong>Compartir</strong> (el cuadro con la flecha hacia arriba).</li>
+    <li>Elija <strong>Agregar a inicio</strong> y luego <strong>Agregar</strong>.</li>
+  </ol>
+</section>
+
+<section class="tarjeta">
+  <h2>Computadora (Chrome o Edge)</h2>
+  <ol>
+    <li>En la barra de direcciones, toque el ícono de instalar (una pantalla con una flecha).</li>
+    <li>Confirme con <strong>Instalar</strong>.</li>
+  </ol>
+</section>
+
+<p class="suave">Importante: la app necesita internet para registrar movimientos, porque todos
+  deben ver la misma información. Si se va la señal, SICH lo avisa.</p>
+<a class="boton-grande secundario" href="{{ url_for('inicio') }}">Volver al menú</a>
+{% endblock %}

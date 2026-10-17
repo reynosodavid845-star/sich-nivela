@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block contenido %}
+<h1>3.1 Buscar herramienta</h1>
+{% if texto == "" %}
+  <p class="suave">Escriba arriba el código, el nombre o el apodo que usa en obra. No importan
+    las mayúsculas, las tildes ni el orden de las palabras.</p>
+  <p class="suave">Pruebe con:</p>
+  <div class="acciones">
+    {% for ejemplo in ejemplos %}<a class="boton secundario" href="?q={{ ejemplo|urlencode }}">{{ ejemplo }}</a>{% endfor %}
+  </div>
+{% elif resultados|length == 0 %}
+  <p class="alerta error" role="alert">No se encontró ninguna herramienta con "{{ texto }}".
+    Intente con otro código, nombre o apodo.</p>
+  <p class="suave">Pruebe con:</p>
+  <div class="acciones">
+    {% for ejemplo in ejemplos %}<a class="boton secundario" href="?q={{ ejemplo|urlencode }}">{{ ejemplo }}</a>{% endfor %}
+  </div>
+{% else %}
+  {% if aproximada %}
+    <p class="alerta aviso" role="status">No hubo coincidencia exacta con "{{ texto }}".
+      Estas herramientas se parecen:</p>
+  {% else %}
+    <p class="suave" role="status">{{ resultados|length }} resultado(s) para "{{ texto }}"</p>
+  {% endif %}
+  <div class="resultados">
+  {% for r in resultados %}
+  <article class="tarjeta">
+    <h2>{{ r.herramienta.codigo }} · {{ r.herramienta.nombre }}
+      <span class="etiqueta estado-{{ r.herramienta.estado|replace(' ', '-')|replace('ñ', 'n') }}">
+        {{ r.herramienta.estado|upper }}</span>
+      {% if r.vencida %}<span class="etiqueta estado-vencida">VENCIDA</span>{% endif %}
+    </h2>
+    <dl>
+      {% for etiqueta, valor in r.detalle %}<dt>{{ etiqueta }}</dt><dd>{{ valor }}</dd>{% endfor %}
+    </dl>
+    {% if r.acciones %}
+    <div class="acciones">
+      {% for id_opcion, texto_accion in r.acciones %}
+        <a class="boton" href="{{ url_for('opcion', id_opcion=id_opcion, codigo=r.herramienta.codigo) }}">{{ texto_accion }}</a>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </article>
+  {% endfor %}
+  </div>
+{% endif %}
+<a class="boton-grande secundario" href="{{ url_for('inicio') }}">Volver al menú</a>
+{% endblock %}

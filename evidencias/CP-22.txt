@@ -1,0 +1,93 @@
+Caso CP-22 - 2.6 Autorizar permanencia en obra
+Ejecutado: 16/10/2026 23:15
+----------------------------------------------------------------------
+============================================================
+ SICH - Sistema de Control de Herramientas
+ Nivela Obras Civiles, S.A.
+============================================================
+
+============================================================
+ SICH - INICIAR SESIÓN
+============================================================
+Usuario: ecifuentes
+Contraseña: ************
+
+Bienvenido(a), Ing. Esteban Cifuentes - Residente de obra
+
+============================================================
+ SICH - MENÚ PRINCIPAL   (Ing. Esteban Cifuentes - Residente de obra)
+============================================================
+ 1. Catálogo de herramientas
+ 2. Movimientos de herramientas
+ 3. Consultas y seguimiento
+ 9. Cerrar sesión
+ 0. Salir
+Elija una opción: 2
+
+============================================================
+ 2. MOVIMIENTOS DE HERRAMIENTAS
+============================================================
+ 1. Registrar salida  [sin permiso]
+ 2. Registrar devolución  [sin permiso]
+ 3. Registrar traslado
+ 4. Reportar daño
+ 5. Registrar revisión  [sin permiso]
+ 6. Autorizar permanencia en obra
+ 0. Regresar al menú principal
+Elija una opción: 6
+
+============================================================
+ 2.6 AUTORIZAR PERMANENCIA EN OBRA
+============================================================
+Herramientas que están en obra:
+  - ROT-02 - Rotomartillo (roto) | ASIGNADA | EUC-022
+  - MEZ-01 - Mezcladora grande (trompo, mezcladora grande) | ASIGNADA | VN-014
+  - NIV-LAS-01 - Nivel láser (nivel, laser) | ASIGNADA | Z11-009
+Escriba código, nombre o apodo (ej. bailarina) o 0 para cancelar: nivel
+
+Se encontraron 2 herramientas con ese nombre o apodo:
+  1. NIV-LAS-01 - Nivel láser (nivel, laser) | ASIGNADA | Z11-009
+  2. NIV-LAS-02 - Nivel láser (nivel, laser) | DISPONIBLE | Bodega
+Elija el número de la herramienta (0 = buscar otra vez): 1
+Obra donde se quedará: Z11-009 - Zona 11 - reparación de drenaje
+Inicio de la permanencia [Enter = 16/10/2026 23:15]: 16/10/2026 17:00
+Fin de la permanencia [Enter = 17/10/2026 06:15]: 17/10/2026 06:15
+¿Confirma que el sitio tiene seguridad (garita, guardián o bodega con llave)? (S/N): S
+Observaciones (opcional, Enter para omitir): 
+
+--- Resumen de la operación ---
+  Herramienta: NIV-LAS-01 - Nivel láser (nivel, laser) | ASIGNADA | Z11-009
+  Obra: Z11-009 - Zona 11 - reparación de drenaje
+  Período: 16/10/2026 17:00 al 17/10/2026 06:15
+  Residente que autoriza: Ing. Esteban Cifuentes
+  Seguridad confirmada: Sí
+-------------------------------
+¿Confirmar operación? (S/N): S
+
+Ya existe la autorización 1 para NIV-LAS-01 en Z11-009 hasta 31/12/2026 17:00.
+
+Presione Enter para volver al menú...
+
+============================================================
+ 2. MOVIMIENTOS DE HERRAMIENTAS
+============================================================
+ 1. Registrar salida  [sin permiso]
+ 2. Registrar devolución  [sin permiso]
+ 3. Registrar traslado
+ 4. Reportar daño
+ 5. Registrar revisión  [sin permiso]
+ 6. Autorizar permanencia en obra
+ 0. Regresar al menú principal
+Elija una opción: 0
+
+============================================================
+ SICH - MENÚ PRINCIPAL   (Ing. Esteban Cifuentes - Residente de obra)
+============================================================
+ 1. Catálogo de herramientas
+ 2. Movimientos de herramientas
+ 3. Consultas y seguimiento
+ 9. Cerrar sesión
+ 0. Salir
+Elija una opción: 0
+
+Gracias por usar SICH. Programa finalizado.

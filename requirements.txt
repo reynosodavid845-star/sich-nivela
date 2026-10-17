@@ -1,0 +1,3 @@
+Flask>=3.0
+# Servidor para publicar en internet (Linux). En Windows no se instala ni hace falta.
+gunicorn>=22.0; sys_platform != "win32"

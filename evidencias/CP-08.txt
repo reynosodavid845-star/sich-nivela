@@ -1,0 +1,106 @@
+Caso CP-08 - 2.2 Registrar devolución
+Ejecutado: 16/10/2026 23:15
+----------------------------------------------------------------------
+============================================================
+ SICH - Sistema de Control de Herramientas
+ Nivela Obras Civiles, S.A.
+============================================================
+
+============================================================
+ SICH - INICIAR SESIÓN
+============================================================
+Usuario: jpivaral
+Contraseña: *********
+
+Bienvenido(a), Julián Pivaral - Encargado de bodega
+
+============================================================
+ SICH - MENÚ PRINCIPAL   (Julián Pivaral - Encargado de bodega)
+============================================================
+ 1. Catálogo de herramientas
+ 2. Movimientos de herramientas
+ 3. Consultas y seguimiento
+ 9. Cerrar sesión
+ 0. Salir
+Elija una opción: 2
+
+============================================================
+ 2. MOVIMIENTOS DE HERRAMIENTAS
+============================================================
+ 1. Registrar salida
+ 2. Registrar devolución
+ 3. Registrar traslado  [sin permiso]
+ 4. Reportar daño
+ 5. Registrar revisión
+ 6. Autorizar permanencia en obra  [sin permiso]
+ 0. Regresar al menú principal
+Elija una opción: 2
+
+============================================================
+ 2.2 REGISTRAR DEVOLUCIÓN
+============================================================
+Herramientas que están en obra:
+  - ROT-02 - Rotomartillo (roto) | ASIGNADA | EUC-022
+  - MEZ-01 - Mezcladora grande (trompo, mezcladora grande) | ASIGNADA | VN-014
+  - NIV-LAS-01 - Nivel láser (nivel, laser) | ASIGNADA | Z11-009
+Escriba código, nombre o apodo (ej. bailarina) o 0 para cancelar: trompo
+Herramienta encontrada: MEZ-01 - Mezcladora grande (trompo, mezcladora grande) | ASIGNADA | VN-014
+Salió a VN-014 - Villa Nueva - banqueta ingreso sur con Luis Aguilar el 16/10/2026 06:15
+Fecha y hora de devolución [Enter = 16/10/2026 23:15]: 15/10/2026 08:00
+La fecha de devolución no puede ser anterior a la salida (16/10/2026 06:15).
+Fecha y hora de devolución [Enter = 16/10/2026 23:15]: 16/10/2026 16:40
+Estado en que se recibe:  1. Bueno   2. Con daño
+Elija 1 o 2: 2
+Observaciones (ej. ruido raro, golpe; Enter para omitir): Manija quebrada
+
+--- Resumen de la operación ---
+  Herramienta: MEZ-01 - Mezcladora grande (trompo, mezcladora grande) | ASIGNADA | VN-014
+  Regresa de: VN-014 - Villa Nueva - banqueta ingreso sur
+  Fecha de devolución: 16/10/2026 16:40
+  Estado recibido: con daño
+  Observaciones: Manija quebrada
+-------------------------------
+¿Confirmar operación? (S/N): S
+
+Operación exitosa: devolución registrada. MEZ-01 está en Bodega con estado 'requiere revisión'. La devolución llegó a tiempo. Debe registrar una revisión antes de volver a sacarla.
+
+¿Desea reportar el daño ahora? (S/N): S
+Describa el daño (mínimo 5 caracteres): Manija quebrada al descargar
+Fecha y hora del daño [Enter = 16/10/2026 23:15]: 16/10/2026 16:40
+Responsable (quién reporta o tenía la herramienta): Luis Aguilar
+
+--- Resumen de la operación ---
+  Herramienta: MEZ-01 - Mezcladora grande (trompo, mezcladora grande) | REQUIERE REVISIÓN | Bodega
+  Daño: Manija quebrada al descargar
+  Fecha: 16/10/2026 16:40
+  Responsable: Luis Aguilar
+-------------------------------
+¿Confirmar operación? (S/N): S
+
+Operación exitosa: daño registrado (reporte 2). MEZ-01 quedó DAÑADA y bloqueada para salir hasta que una revisión la declare apta.
+
+Presione Enter para volver al menú...
+
+============================================================
+ 2. MOVIMIENTOS DE HERRAMIENTAS
+============================================================
+ 1. Registrar salida
+ 2. Registrar devolución
+ 3. Registrar traslado  [sin permiso]
+ 4. Reportar daño
+ 5. Registrar revisión
+ 6. Autorizar permanencia en obra  [sin permiso]
+ 0. Regresar al menú principal
+Elija una opción: 0
+
+============================================================
+ SICH - MENÚ PRINCIPAL   (Julián Pivaral - Encargado de bodega)
+============================================================
+ 1. Catálogo de herramientas
+ 2. Movimientos de herramientas
+ 3. Consultas y seguimiento
+ 9. Cerrar sesión
+ 0. Salir
+Elija una opción: 0
+
+Gracias por usar SICH. Programa finalizado.

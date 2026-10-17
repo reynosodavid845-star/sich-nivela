@@ -1,0 +1,37 @@
+Caso CN-05 - Inicio de sesión: credenciales incorrectas y reintento
+Ejecutado: 16/10/2026 23:15
+----------------------------------------------------------------------
+============================================================
+ SICH - Sistema de Control de Herramientas
+ Nivela Obras Civiles, S.A.
+============================================================
+
+============================================================
+ SICH - INICIAR SESIÓN
+============================================================
+Usuario: jpivaral
+Contraseña: ***************
+
+Usuario o contraseña incorrectos.
+Le quedan 2 intento(s).
+¿Desea intentar de nuevo? (S/N): S
+
+============================================================
+ SICH - INICIAR SESIÓN
+============================================================
+Usuario: jpivaral
+Contraseña: *********
+
+Bienvenido(a), Julián Pivaral - Encargado de bodega
+
+============================================================
+ SICH - MENÚ PRINCIPAL   (Julián Pivaral - Encargado de bodega)
+============================================================
+ 1. Catálogo de herramientas
+ 2. Movimientos de herramientas
+ 3. Consultas y seguimiento
+ 9. Cerrar sesión
+ 0. Salir
+Elija una opción: 0
+
+Gracias por usar SICH. Programa finalizado.

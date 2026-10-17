@@ -1,0 +1,16 @@
+flowchart TD
+    A(["Inicio 2.4 Reportar daño<br/>(bodega, residente, maestro)"]) --> C[["Seleccionar herramienta<br/>(código, nombre o apodo)"]]
+    C --> C1{"¿Canceló?"}
+    C1 -->|Sí| X1[/"Operación<br/>cancelada"/]
+    X1 --> Z1(["Volver al menú"])
+    C1 -->|No| D{"¿Dada de<br/>baja?"}
+    D -->|Sí| D1[/"Está dada de baja;<br/>no se registran daños"/]
+    D1 --> Z2(["Volver al menú"])
+    D -->|No| E[/"Leer descripción<br/>del daño"/]
+    E --> E1{"¿Vacía?"}
+    E1 -->|Sí| E2[/"Este campo es<br/>obligatorio"/]
+    E2 --> E
+    E1 -->|No| E3{"¿Menos de 5<br/>caracteres?"}
+    E3 -->|Sí| E4[/"Debe escribir al menos<br/>5 caracteres"/]
+    E4 --> E
+    E3 -->|No| P(("A"))

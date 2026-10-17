@@ -1,0 +1,30 @@
+[
+  {
+    "usuario": "jpivaral",
+    "nombre": "Julián Pivaral",
+    "rol": "bodega",
+    "contrasena": "3e2388e8ceddc313076daab3e4eb98a3feb2c0da2464e9c632eff130483208eb",
+    "obra": ""
+  },
+  {
+    "usuario": "ecifuentes",
+    "nombre": "Ing. Esteban Cifuentes",
+    "rol": "residente",
+    "contrasena": "ad8127aa848ea3ce220665cf291c2d7fee19db58f4bdbd2a6b5395eb715a70b2",
+    "obra": ""
+  },
+  {
+    "usuario": "prodas",
+    "nombre": "Ing. Pamela Rodas",
+    "rol": "gerente",
+    "contrasena": "ecfba551324356e5bd27b548adf36b728783f60d9b573d142caac7baad62be49",
+    "obra": ""
+  },
+  {
+    "usuario": "esantos",
+    "nombre": "Erick Santos",
+    "rol": "maestro",
+    "contrasena": "f3741ea13474119a2ab952002aa8e310aef68bde0b8fe061bc41e106ab22710e",
+    "obra": "EUC-022"
+  }
+]

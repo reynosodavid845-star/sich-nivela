@@ -1,0 +1,17 @@
+flowchart TD
+    A(("A")) --> M0["Identificar rol y permisos:<br/>bodega, residente,<br/>gerente o maestro"]
+    M0 --> M1[/"Mostrar MENÚ PRINCIPAL<br/>1 Catálogo · 2 Movimientos<br/>3 Consultas · 9 Cerrar sesión · 0 Salir"/]
+    M1 --> M2[/"Leer opción"/]
+    M2 --> M3{"¿Número válido<br/>1, 2, 3, 9 o 0?"}
+    M3 -->|No| M4[/"Opción no válida,<br/>intente de nuevo"/]
+    M4 --> M2
+    M3 -->|Sí| M5{"¿Opción?"}
+    M5 -->|1| S1[["Submenú 1<br/>Catálogo"]]
+    M5 -->|2| S2[["Submenú 2<br/>Movimientos"]]
+    M5 -->|3| S3[["Submenú 3<br/>Consultas"]]
+    M5 -->|9| CS[/"Sesión cerrada"/]
+    M5 -->|0| C(("C"))
+    CS --> B(("B"))
+    S1 -->|0 Regresar| M1
+    S2 -->|0 Regresar| M1
+    S3 -->|0 Regresar| M1

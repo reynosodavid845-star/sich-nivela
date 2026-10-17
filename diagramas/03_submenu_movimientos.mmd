@@ -1,0 +1,27 @@
+flowchart TD
+    A(["Submenú 2: Movimientos"]) --> B[/"Mostrar 2.1 a 2.6<br/>con marca sin permiso<br/>y 0 Regresar"/]
+    B --> C[/"Leer opción"/]
+    C --> D{"¿Número<br/>de 0 a 6?"}
+    D -->|No| E[/"Opción no válida,<br/>intente de nuevo"/]
+    E --> C
+    D -->|Sí| F{"¿Opción = 0?"}
+    F -->|Sí| R(["Regresar al<br/>menú principal"])
+    F -->|No| G{"¿El rol tiene<br/>permiso?"}
+    G -->|No| H[/"No tiene permisos<br/>para esta opción"/]
+    G -->|Sí| K{"¿Opción?"}
+    K -->|1| K1[["2.1 Registrar<br/>salida"]]
+    K -->|2| K2[["2.2 Registrar<br/>devolución"]]
+    K -->|3| K3[["2.3 Registrar<br/>traslado"]]
+    K -->|4| K4[["2.4 Reportar<br/>daño"]]
+    K -->|5| K5[["2.5 Registrar<br/>revisión"]]
+    K -->|6| K6[["2.6 Autorizar<br/>permanencia"]]
+    H --> P[/"Presione Enter para volver al menú"/]
+    K1 --> P
+    K2 --> P
+    K3 --> P
+    K4 --> P
+    K5 --> P
+    K6 --> P
+    P --> B
+    classDef hecha fill:#dff0e3,stroke:#1d6b34,color:#0f3d1e
+    class K1,K2,K3,K4,K5,K6 hecha

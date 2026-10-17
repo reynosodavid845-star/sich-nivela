@@ -1,0 +1,19 @@
+flowchart TD
+    P(("A")) --> M[/"Mostrar resumen"/]
+    M --> N{"¿Confirmar<br/>operación?<br/>S/N"}
+    N -->|N| X[/"Operación cancelada.<br/>No se guardó<br/>ningún cambio."/]
+    X --> Z1(["Volver al menú"])
+    N -->|S| T{"¿Pasó la hora<br/>esperada sin<br/>autorización?"}
+    T -->|Sí| T1["Marcar TARDE"]
+    T -->|No| T2["Marcar a tiempo"]
+    T1 --> U{"¿Recibida<br/>con daño?"}
+    T2 --> U
+    U -->|Sí| U1["estado =<br/>requiere revisión"]
+    U -->|No| V{"¿Ya estaba<br/>dañada?"}
+    V -->|Sí| V1["estado =<br/>dañada"]
+    V -->|No| W{"¿Motor o cable y<br/>observación con ruido,<br/>golpe o cable?"}
+    W -->|Sí| U1
+    W -->|No| W1["estado =<br/>disponible"]
+    U1 --> B(("B"))
+    V1 --> B
+    W1 --> B

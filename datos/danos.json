@@ -1,0 +1,11 @@
+[
+  {
+    "id": 1,
+    "codigo": "COM-02",
+    "descripcion": "Regresó con ruido raro en el motor.",
+    "fecha": "2026-06-26 16:50",
+    "responsable": "Julián Pivaral",
+    "registrado_por": "jpivaral",
+    "ubicacion": "Bodega"
+  }
+]

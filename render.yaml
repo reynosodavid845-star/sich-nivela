@@ -1,0 +1,26 @@
+# Configuración para publicar SICH en Render (https://render.com) desde GitHub.
+# Render lee este archivo con "New > Blueprint" y crea el servicio web gratis.
+services:
+  - type: web
+    name: sich-nivela
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn wsgi:application --workers 1 --threads 4 --bind 0.0.0.0:$PORT
+    healthCheckPath: /login
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.7"
+      - key: SICH_PUBLICO
+        value: "1"
+      - key: SICH_CLAVE
+        generateValue: true
+      # Contraseñas reales: Render las pide al crear el servicio (no se guardan en GitHub).
+      - key: SICH_CONTRASENA_JPIVARAL
+        sync: false
+      - key: SICH_CONTRASENA_ECIFUENTES
+        sync: false
+      - key: SICH_CONTRASENA_PRODAS
+        sync: false
+      - key: SICH_CONTRASENA_ESANTOS
+        sync: false

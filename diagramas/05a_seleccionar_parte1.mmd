@@ -1,0 +1,20 @@
+flowchart TD
+    A(["Inicio subproceso:<br/>seleccionar herramienta"]) --> B[/"Leer código, nombre<br/>o apodo (0 = cancelar)"/]
+    B --> B1{"¿Vacío?"}
+    B1 -->|Sí| B2[/"Este campo es<br/>obligatorio"/]
+    B2 --> B
+    B1 -->|No| C{"¿Texto = 0?"}
+    C -->|Sí| R0(["Devolver:<br/>cancelado"])
+    C -->|No| D["Normalizar: minúsculas,<br/>sin tildes; código sin guiones"]
+    D --> E{"¿Es un código<br/>oficial exacto?"}
+    E -->|Sí| R1(["Devolver esa<br/>herramienta"])
+    E -->|No| F["Quitar artículos (la, el, de…)<br/>y separar en palabras"]
+    F --> F1["Buscar herramientas que tengan<br/>TODAS las palabras en código, nombre,<br/>apodos, marca o categoría"]
+    F1 --> F2{"¿Encontró<br/>alguna?"}
+    F2 -->|No| F3["Repetir aceptando palabras<br/>parecidas (errores de escritura)"]
+    F3 --> F4{"¿Encontró<br/>alguna?"}
+    F4 -->|No| H[/"No se encontró ninguna<br/>herramienta. Intente<br/>con otro texto."/]
+    H --> B
+    F4 -->|Sí| F5[/"No hubo coincidencia exacta;<br/>se muestran las parecidas"/]
+    F5 --> P
+    F2 -->|Sí| P(("A"))

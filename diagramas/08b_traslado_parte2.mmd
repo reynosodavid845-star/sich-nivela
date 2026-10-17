@@ -1,0 +1,21 @@
+flowchart TD
+    P(("A")) --> F[/"Mostrar obras activas<br/>y leer obra de destino"/]
+    F --> F1{"¿Existe, activa<br/>y no es Bodega?"}
+    F1 -->|No| F2[/"La obra no existe o<br/>no está activa"/]
+    F2 --> F
+    F1 -->|Sí| F3{"¿Destino =<br/>origen?"}
+    F3 -->|Sí| F4[/"Debe ser distinta de<br/>la obra de origen"/]
+    F4 --> F
+    F3 -->|No| G[/"Leer responsable en<br/>la obra de destino"/]
+    G --> G1{"¿Vacío?"}
+    G1 -->|Sí| G2[/"Este campo es<br/>obligatorio"/]
+    G2 --> G
+    G1 -->|No| H[/"Leer observaciones<br/>(opcional)"/]
+    H --> M[/"Mostrar resumen: origen,<br/>destino, responsable<br/>y residente que aprueba"/]
+    M --> N{"¿Confirmar<br/>operación?<br/>S/N"}
+    N -->|N| X[/"Operación cancelada.<br/>No se guardó<br/>ningún cambio."/]
+    X --> Z1(["Volver al menú"])
+    N -->|S| O["registrar_traslado(): movimiento<br/>tipo traslado; ubicación = destino;<br/>responsable nuevo"]
+    O --> O1[("Guardar JSON")]
+    O1 --> O2[/"Operación exitosa: traslado<br/>de origen a destino"/]
+    O2 --> Z2(["Volver al menú"])

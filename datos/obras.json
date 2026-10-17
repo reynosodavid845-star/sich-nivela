@@ -1,0 +1,37 @@
+[
+  {
+    "codigo": "Bodega",
+    "nombre": "Bodega-oficina San Cristóbal, Mixco",
+    "activa": true,
+    "es_bodega": true,
+    "origen": "Dato de prueba precargado (el Módulo 1 - Catálogo está pendiente)"
+  },
+  {
+    "codigo": "VN-014",
+    "nombre": "Villa Nueva - banqueta ingreso sur",
+    "activa": true,
+    "es_bodega": false,
+    "origen": "Dato de prueba precargado (el Módulo 1 - Catálogo está pendiente)"
+  },
+  {
+    "codigo": "EUC-022",
+    "nombre": "Casa Eucaliptos - muro lateral",
+    "activa": true,
+    "es_bodega": false,
+    "origen": "Dato de prueba precargado (el Módulo 1 - Catálogo está pendiente)"
+  },
+  {
+    "codigo": "Z11-009",
+    "nombre": "Zona 11 - reparación de drenaje",
+    "activa": true,
+    "es_bodega": false,
+    "origen": "Dato de prueba precargado (el Módulo 1 - Catálogo está pendiente)"
+  },
+  {
+    "codigo": "CIS-005",
+    "nombre": "Cisterna colegio (obra terminada)",
+    "activa": false,
+    "es_bodega": false,
+    "origen": "Dato de prueba precargado (el Módulo 1 - Catálogo está pendiente)"
+  }
+]

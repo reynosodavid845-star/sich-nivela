@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block contenido %}
+<section class="tarjeta angosta">
+  <h1>Iniciar sesión</h1>
+  <p class="suave">Sistema de Control de Herramientas de Nivela</p>
+  {% for aviso in avisos %}<p class="alerta aviso">{{ aviso }}</p>{% endfor %}
+  {% if error %}<p class="alerta error" role="alert">{{ error }}</p>{% endif %}
+  {% if minutos_bloqueo > 0 %}
+    <p class="alerta error" role="alert">Se agotaron los 3 intentos. Espere {{ minutos_bloqueo }}
+      minuto(s) y vuelva a intentarlo, o pida a bodega que revise su usuario.</p>
+    <a class="boton-grande secundario" href="{{ url_for('login') }}">Volver a intentar</a>
+  {% else %}
+  <form method="post" class="formulario">
+    <input type="hidden" name="token" value="{{ token }}">
+    <label for="usuario">Usuario</label>
+    <input id="usuario" name="usuario" required autocomplete="username" autocapitalize="none"
+           spellcheck="false" value="{{ nombre_escrito }}" {% if not nombre_escrito %}autofocus{% endif %}>
+    <label for="contrasena">Contraseña</label>
+    <div class="con-boton">
+      <input id="contrasena" name="contrasena" type="password" required
+             autocomplete="current-password" {% if nombre_escrito %}autofocus{% endif %}>
+      <button type="button" class="boton-ver" data-mostrar="contrasena" aria-pressed="false">Ver</button>
+    </div>
+    <button class="boton-grande" type="submit" data-enviando="Entrando...">Entrar</button>
+  </form>
+  {% endif %}
+</section>
+<p class="centrado"><a class="boton secundario" href="{{ url_for('instalar') }}">Instalar SICH en el teléfono</a></p>
+{% endblock %}

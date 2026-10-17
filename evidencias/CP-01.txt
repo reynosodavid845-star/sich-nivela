@@ -1,0 +1,94 @@
+Caso CP-01 - 2.1 Registrar salida
+Ejecutado: 16/10/2026 23:15
+----------------------------------------------------------------------
+============================================================
+ SICH - Sistema de Control de Herramientas
+ Nivela Obras Civiles, S.A.
+============================================================
+
+============================================================
+ SICH - INICIAR SESIÓN
+============================================================
+Usuario: jpivaral
+Contraseña: *********
+
+Bienvenido(a), Julián Pivaral - Encargado de bodega
+
+============================================================
+ SICH - MENÚ PRINCIPAL   (Julián Pivaral - Encargado de bodega)
+============================================================
+ 1. Catálogo de herramientas
+ 2. Movimientos de herramientas
+ 3. Consultas y seguimiento
+ 9. Cerrar sesión
+ 0. Salir
+Elija una opción: 2
+
+============================================================
+ 2. MOVIMIENTOS DE HERRAMIENTAS
+============================================================
+ 1. Registrar salida
+ 2. Registrar devolución
+ 3. Registrar traslado  [sin permiso]
+ 4. Reportar daño
+ 5. Registrar revisión
+ 6. Autorizar permanencia en obra  [sin permiso]
+ 0. Regresar al menú principal
+Elija una opción: 1
+
+============================================================
+ 2.1 REGISTRAR SALIDA DE HERRAMIENTA
+============================================================
+Escriba código, nombre o apodo (ej. bailarina) o 0 para cancelar: bailarina
+
+Se encontraron 2 herramientas con ese nombre o apodo:
+  1. COM-01 - Compactadora pequeña (bailarina, rana, bailarina chiquita) | DISPONIBLE | Bodega
+  2. COM-02 - Compactadora (bailarina grande) | REQUIERE REVISIÓN | Bodega
+Elija el número de la herramienta (0 = buscar otra vez): 1
+
+Obras activas:
+  - VN-014 - Villa Nueva - banqueta ingreso sur
+  - EUC-022 - Casa Eucaliptos - muro lateral
+  - Z11-009 - Zona 11 - reparación de drenaje
+Obra de destino (código, ej. VN-014): VN-014
+Responsable que recibe la herramienta: Erick Santos
+Fecha y hora de salida [Enter = 16/10/2026 23:15]: 16/10/2026 06:15
+Fecha y hora esperada de devolución [Enter = 16/10/2026 17:00]: 16/10/2026 17:00
+Observaciones (opcional, Enter para omitir): Va en el picop gris
+
+--- Resumen de la operación ---
+  Herramienta: COM-01 - Compactadora pequeña (bailarina, rana, bailarina chiquita) | DISPONIBLE | Bodega
+  Obra de destino: VN-014 - Villa Nueva - banqueta ingreso sur
+  Responsable: Erick Santos
+  Salida: 16/10/2026 06:15
+  Devolución esperada: 16/10/2026 17:00
+-------------------------------
+¿Confirmar operación? (S/N): S
+
+Operación exitosa: salida registrada. COM-01 quedó ASIGNADA en VN-014 - Villa Nueva - banqueta ingreso sur, responsable Erick Santos, devolución esperada 16/10/2026 17:00.
+
+Presione Enter para volver al menú...
+
+============================================================
+ 2. MOVIMIENTOS DE HERRAMIENTAS
+============================================================
+ 1. Registrar salida
+ 2. Registrar devolución
+ 3. Registrar traslado  [sin permiso]
+ 4. Reportar daño
+ 5. Registrar revisión
+ 6. Autorizar permanencia en obra  [sin permiso]
+ 0. Regresar al menú principal
+Elija una opción: 0
+
+============================================================
+ SICH - MENÚ PRINCIPAL   (Julián Pivaral - Encargado de bodega)
+============================================================
+ 1. Catálogo de herramientas
+ 2. Movimientos de herramientas
+ 3. Consultas y seguimiento
+ 9. Cerrar sesión
+ 0. Salir
+Elija una opción: 0
+
+Gracias por usar SICH. Programa finalizado.

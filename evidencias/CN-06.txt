@@ -1,0 +1,38 @@
+Caso CN-06 - Inicio de sesión: 3 intentos fallidos
+Ejecutado: 16/10/2026 23:15
+----------------------------------------------------------------------
+============================================================
+ SICH - Sistema de Control de Herramientas
+ Nivela Obras Civiles, S.A.
+============================================================
+
+============================================================
+ SICH - INICIAR SESIÓN
+============================================================
+Usuario: pedro
+Contraseña: ****
+
+Usuario o contraseña incorrectos.
+Le quedan 2 intento(s).
+¿Desea intentar de nuevo? (S/N): S
+
+============================================================
+ SICH - INICIAR SESIÓN
+============================================================
+Usuario: pedro
+Contraseña: ****
+
+Usuario o contraseña incorrectos.
+Le quedan 1 intento(s).
+¿Desea intentar de nuevo? (S/N): S
+
+============================================================
+ SICH - INICIAR SESIÓN
+============================================================
+Usuario: pedro
+Contraseña: ****
+
+Usuario o contraseña incorrectos.
+Se agotaron los 3 intentos.
+
+Gracias por usar SICH. Programa finalizado.

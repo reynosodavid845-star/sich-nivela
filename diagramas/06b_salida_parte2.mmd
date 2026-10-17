@@ -1,0 +1,20 @@
+flowchart TD
+    P(("A")) --> H[/"Leer fecha y hora de salida<br/>(Enter = actual)"/]
+    H --> H1{"¿Fecha<br/>válida?"}
+    H1 -->|No| H2[/"Fecha inválida"/]
+    H2 --> H
+    H1 -->|Sí| J[/"Leer devolución esperada<br/>(Enter = 17:00)"/]
+    J --> J1{"¿Fecha<br/>válida?"}
+    J1 -->|No| J2[/"Fecha inválida"/]
+    J2 --> J
+    J1 -->|Sí| J3{"¿Posterior a<br/>la salida?"}
+    J3 -->|No| J4[/"Debe ser posterior<br/>a la salida"/]
+    J4 --> J
+    J3 -->|Sí| K{"¿Fuera de<br/>16:30 - 17:15?"}
+    K -->|Sí| K1{"¿Residente<br/>autorizó? S/N"}
+    K1 -->|N| K3[/"Escriba otra<br/>fecha y hora"/]
+    K3 --> J
+    K1 -->|S| K2[/"Leer residente<br/>que autorizó"/]
+    K2 --> L
+    K -->|No| L[/"Leer observaciones<br/>(opcional)"/]
+    L --> Q(("B"))

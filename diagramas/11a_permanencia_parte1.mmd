@@ -1,0 +1,18 @@
+flowchart TD
+    A(["Inicio 2.6 Autorizar permanencia<br/>(residente de obra)"]) --> B{"¿Hay<br/>herramientas<br/>en obra?"}
+    B -->|No| B1[/"No hay herramientas<br/>asignadas en obras"/]
+    B1 --> Z1(["Volver al menú"])
+    B -->|Sí| B2[/"Mostrar herramientas<br/>que están en obra"/]
+    B2 --> C[["Seleccionar herramienta<br/>(código, nombre o apodo)"]]
+    C --> C1{"¿Canceló?"}
+    C1 -->|Sí| X1[/"Operación<br/>cancelada"/]
+    X1 --> Z2(["Volver al menú"])
+    C1 -->|No| D{"¿Asignada y<br/>en una obra?"}
+    D -->|No| D1[/"No se puede autorizar:<br/>no está asignada a una obra"/]
+    D1 --> Z3(["Volver al menú"])
+    D -->|Sí| E[/"Mostrar obra donde se<br/>quedará (ubicación actual)"/]
+    E --> F[/"Leer inicio<br/>(Enter = actual)"/]
+    F --> F1{"¿Fecha<br/>válida?"}
+    F1 -->|No| F2[/"Fecha inválida"/]
+    F2 --> F
+    F1 -->|Sí| P(("A"))

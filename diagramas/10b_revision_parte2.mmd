@@ -1,0 +1,22 @@
+flowchart TD
+    P(("A")) --> F[/"Leer resultado:<br/>1 Apta / 2 No apta"/]
+    F --> F1{"¿1 o 2?"}
+    F1 -->|No| F2[/"Opción no válida,<br/>intente de nuevo"/]
+    F2 --> F
+    F1 -->|Sí| G[/"Leer nombre de<br/>quien revisó"/]
+    G --> G1{"¿Vacío?"}
+    G1 -->|Sí| G2[/"Este campo es<br/>obligatorio"/]
+    G2 --> G
+    G1 -->|No| H[/"Leer observaciones<br/>(opcional)"/]
+    H --> M[/"Mostrar resumen"/]
+    M --> N{"¿Confirmar<br/>operación?<br/>S/N"}
+    N -->|N| X[/"Operación cancelada.<br/>No se guardó<br/>ningún cambio."/]
+    X --> Z1(["Volver al menú"])
+    N -->|S| O{"¿Resultado<br/>= apta?"}
+    O -->|Sí| O1["estado =<br/>disponible"]
+    O -->|No| O2["estado =<br/>en reparación"]
+    O1 --> Q["Agregar movimiento<br/>tipo revisión"]
+    O2 --> Q
+    Q --> Q1[("Guardar JSON")]
+    Q1 --> Q2[/"Operación exitosa: APTA y<br/>DISPONIBLE o NO apta y<br/>EN REPARACIÓN"/]
+    Q2 --> Z2(["Volver al menú"])

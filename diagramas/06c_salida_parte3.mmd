@@ -1,0 +1,9 @@
+flowchart TD
+    Q(("B")) --> M[/"Mostrar resumen: herramienta,<br/>obra, responsable, salida<br/>y devolución esperada"/]
+    M --> N{"¿Confirmar<br/>operación?<br/>S/N"}
+    N -->|N| X[/"Operación cancelada.<br/>No se guardó<br/>ningún cambio."/]
+    X --> Z1(["Volver al menú"])
+    N -->|S| O["registrar_salida(): valida de nuevo;<br/>estado = asignada, ubicación = obra,<br/>responsable y fechas;<br/>agregar movimiento tipo salida"]
+    O --> O1[("Guardar JSON")]
+    O1 --> O2[/"Operación exitosa:<br/>salida registrada"/]
+    O2 --> Z2(["Volver al menú"])

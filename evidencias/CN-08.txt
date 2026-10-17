@@ -1,0 +1,19 @@
+Caso CN-08 - Inicio de sesión: el usuario decide salir
+Ejecutado: 16/10/2026 23:15
+----------------------------------------------------------------------
+============================================================
+ SICH - Sistema de Control de Herramientas
+ Nivela Obras Civiles, S.A.
+============================================================
+
+============================================================
+ SICH - INICIAR SESIÓN
+============================================================
+Usuario: jpivaral
+Contraseña: ****
+
+Usuario o contraseña incorrectos.
+Le quedan 2 intento(s).
+¿Desea intentar de nuevo? (S/N): N
+
+Gracias por usar SICH. Programa finalizado.

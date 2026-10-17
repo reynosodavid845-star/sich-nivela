@@ -1,0 +1,213 @@
+/* SICH - estilos sencillos, móvil primero, alto contraste */
+:root {
+  --fondo: #f4f5f7;
+  --texto: #111418;
+  --suave: #4a5260;
+  --tarjeta: #ffffff;
+  --borde: #c9ced6;
+  --primario: #0b4f8a;
+  --primario-texto: #ffffff;
+  --verde: #1d6b34;
+  --azul: #0b4f8a;
+  --rojo: #a4161a;
+  --naranja: #8a4b00;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 18px;
+  line-height: 1.4;
+  background: var(--fondo);
+  color: var(--texto);
+}
+
+main { max-width: 760px; margin: 0 auto; padding: 0 16px 24px; }
+
+.barra {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px;
+  background: var(--primario); color: var(--primario-texto); padding: 12px 16px;
+}
+.marca { color: var(--primario-texto); font-weight: bold; font-size: 24px; text-decoration: none; }
+.quien { flex: 1; font-size: 16px; }
+
+.busqueda { display: flex; gap: 8px; max-width: 760px; margin: 12px auto; padding: 0 16px; }
+.busqueda input { flex: 1; min-width: 0; }
+
+h1 { font-size: 26px; margin: 18px 0 12px; }
+h2 { font-size: 20px; margin: 4px 0 10px; }
+
+input, select, button {
+  font: inherit; width: 100%; padding: 12px; border-radius: 8px;
+  border: 2px solid var(--borde); background: #fff; color: var(--texto);
+}
+.busqueda button { width: auto; }
+label { display: block; font-weight: bold; margin: 14px 0 6px; }
+.ayuda { display: block; color: var(--suave); margin-top: 4px; font-size: 15px; }
+.oculto { position: absolute; left: -9999px; }
+
+button, .boton, .boton-grande, .boton-chico {
+  display: inline-block; text-decoration: none; cursor: pointer; text-align: center;
+  background: var(--primario); color: var(--primario-texto); border: 2px solid var(--primario);
+  border-radius: 10px; font-weight: bold;
+}
+.boton { padding: 10px 14px; margin: 4px 4px 0 0; width: auto; }
+.boton-chico { padding: 6px 10px; font-size: 15px; background: #fff; color: var(--primario); }
+.boton-grande { display: block; width: 100%; padding: 16px; margin: 10px 0; font-size: 19px; }
+.secundario { background: #fff; color: var(--primario); }
+.apagado { background: #e7e9ed; color: var(--suave); border-color: var(--borde); }
+.boton-grande small { display: block; font-weight: normal; font-size: 15px; }
+
+.lista-botones { display: block; }
+
+.tarjeta {
+  background: var(--tarjeta); border: 1px solid var(--borde); border-radius: 12px;
+  padding: 16px; margin: 12px 0;
+}
+.angosta { max-width: 420px; margin: 24px auto; }
+.suave { color: var(--suave); }
+
+.tablero { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+.cuadro {
+  background: #fff; border-radius: 12px; padding: 14px; border-left: 8px solid var(--borde);
+  display: flex; flex-direction: column;
+}
+.cuadro .numero { font-size: 34px; font-weight: bold; }
+.cuadro .nombre { font-size: 16px; }
+
+/* Los estados siempre llevan texto además del color */
+.estado-disponible { border-color: var(--verde); }
+.estado-asignada { border-color: var(--azul); }
+.estado-vencida { border-color: var(--rojo); }
+.estado-danada, .estado-dañada, .estado-requiere-revisión, .estado-en-reparación { border-color: var(--naranja); }
+
+.etiqueta {
+  display: inline-block; font-size: 14px; padding: 2px 8px; border-radius: 6px;
+  border: 2px solid var(--borde); vertical-align: middle; margin-left: 4px;
+}
+.etiqueta.estado-disponible { color: var(--verde); }
+.etiqueta.estado-asignada { color: var(--azul); }
+.etiqueta.estado-vencida, .etiqueta.estado-dada-de-baja { color: var(--rojo); border-color: var(--rojo); }
+.etiqueta.estado-danada, .etiqueta.estado-requiere-revisión, .etiqueta.estado-en-reparación { color: var(--naranja); }
+
+dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 12px; margin: 0 0 10px; }
+dt { font-weight: bold; }
+dd { margin: 0; }
+
+.alerta { padding: 12px; border-radius: 8px; border-left: 6px solid; background: #fff; }
+.alerta.error { border-color: var(--rojo); color: var(--rojo); }
+.alerta.exito { border-color: var(--verde); color: var(--verde); font-weight: bold; }
+.alerta.aviso { border-color: var(--naranja); color: var(--naranja); }
+.pregunta { font-size: 22px; font-weight: bold; }
+
+footer { text-align: center; color: var(--suave); font-size: 14px; padding: 16px; }
+
+@media (max-width: 420px) {
+  dl { grid-template-columns: 1fr; }
+  dt { margin-top: 6px; }
+}
+
+/* ---------- Mejoras de la versión 2 ---------- */
+.barra { position: sticky; top: 0; z-index: 10; }
+.saltar { position: absolute; left: -9999px; }
+.saltar:focus { left: 8px; top: 8px; z-index: 20; background: #fff; padding: 8px; }
+
+/* Foco grueso y visible para teclado y lectores de pantalla */
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible,
+.alerta:focus { outline: 4px solid #f2b705; outline-offset: 2px; }
+
+button:hover, .boton:hover, .boton-grande:hover { filter: brightness(1.12); }
+.secundario:hover { background: #e8f0f8; filter: none; }
+
+.migas { font-size: 15px; margin-top: 10px; color: var(--suave); }
+.migas a { color: var(--primario); }
+.migas span { margin: 0 4px; }
+
+.saludo { margin: 8px 0 0; font-size: 15px; }
+.cuadro small { color: var(--suave); font-size: 13px; margin-top: 2px; }
+
+.rapidos { display: grid; grid-template-columns: 1fr; gap: 0 10px; }
+@media (min-width: 600px) { .rapidos { grid-template-columns: 1fr 1fr; } }
+.rapidos .boton-grande small { opacity: .85; }
+
+.campo { margin-bottom: 4px; }
+.campo[hidden] { display: none; }
+.resaltado { background: #fff7e0; border-radius: 8px; padding: 4px 8px 8px; }
+.filtro { margin-bottom: 6px; border-style: dashed; }
+
+.con-boton { display: flex; gap: 8px; }
+.con-boton input { flex: 1; min-width: 0; }
+.boton-ver { width: auto; background: #fff; color: var(--primario); }
+
+.alerta ul { margin: 6px 0 0; padding-left: 20px; }
+.acciones-confirmar { display: block; }
+.boton.secundario { background: #fff; color: var(--primario); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .boton-grande, .boton { transition: filter .15s; }
+}
+
+@media print {
+  .barra, .busqueda, footer, .boton-grande, .boton { display: none; }
+}
+
+/* ---------- Versión 4: celulares, tablets y app instalada ---------- */
+
+/* Respeta la muesca y la barra de gestos de los teléfonos */
+.barra { padding-top: max(12px, env(safe-area-inset-top));
+         padding-left: max(16px, env(safe-area-inset-left));
+         padding-right: max(16px, env(safe-area-inset-right)); }
+main { padding-left: max(16px, env(safe-area-inset-left));
+       padding-right: max(16px, env(safe-area-inset-right)); }
+footer { padding-bottom: max(16px, env(safe-area-inset-bottom)); }
+footer a { color: var(--primario); display: inline-block; padding: 8px; }
+footer p { margin: 4px 0 0; }
+#boton-instalar { display: block; margin: 0 auto 8px; background: var(--primario); color: #fff; }
+#boton-instalar[hidden] { display: none; }
+
+/* Áreas táctiles de al menos 48 px y sin zoom raro al tocar campos en iPhone */
+input, select, button { min-height: 48px; font-size: max(16px, 1em); }
+html { -webkit-text-size-adjust: 100%; }
+body { overscroll-behavior-y: none; }
+a, button { -webkit-tap-highlight-color: rgba(11, 79, 138, .15); }
+
+/* Teléfono muy angosto: barra en dos filas */
+@media (max-width: 360px) {
+  .quien { flex-basis: 100%; order: 3; font-size: 14px; }
+  .cuadro .numero { font-size: 28px; }
+}
+
+/* Tablet vertical y más grande */
+@media (min-width: 768px) {
+  main, .busqueda { max-width: 960px; }
+  body { font-size: 19px; }
+  h1 { font-size: 30px; }
+  .tablero { grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .cuadro .numero { font-size: 40px; }
+  .lista-botones { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; }
+  .rapidos { grid-template-columns: repeat(3, 1fr); }
+  .formulario, .tarjeta > form { max-width: 720px; }
+  .acciones-confirmar { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .tarjeta.angosta { max-width: 480px; }
+}
+
+/* Resultados de búsqueda en dos columnas en tablet horizontal o computadora */
+@media (min-width: 1024px) {
+  .resultados { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; align-items: start; }
+}
+
+/* Tablet o teléfono acostado (poca altura): todo más compacto */
+@media (orientation: landscape) and (max-height: 500px) {
+  .barra { position: static; }
+  .boton-grande { padding: 12px; margin: 6px 0; }
+  .cuadro { padding: 10px; }
+}
+
+/* Cuando se abre como app instalada */
+@media (display-mode: standalone) {
+  .barra { padding-top: max(14px, env(safe-area-inset-top)); }
+  #boton-instalar { display: none; }
+}
+.centrado { text-align: center; }

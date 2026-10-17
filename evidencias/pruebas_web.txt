@@ -1,0 +1,15 @@
+> py pruebas_web.py
+W-01 Satisfactorio    Búsqueda flexible (mayúsculas, artículos, orden, errores de escritura)
+W-02 Satisfactorio    Inicio de sesión: 3 intentos y bloqueo de 5 minutos
+W-03 Satisfactorio    Formulario sin token es rechazado
+W-04 Satisfactorio    Salida completa: revisar, confirmar y guardar
+W-05 Satisfactorio    La web aplica las mismas reglas que la consola
+W-06 Satisfactorio    Accesos rápidos según el rol
+W-07 Satisfactorio    Sesión vencida y página inexistente
+W-08 Satisfactorio    Opción sin permiso y opción pendiente
+W-09 Satisfactorio    Bloqueo por IP aunque se borren las cookies
+W-10 Satisfactorio    App instalable: manifiesto, service worker, sin conexión, íconos
+W-11 Satisfactorio    Versión publicada rechaza contraseñas de prueba
+W-12 Satisfactorio    Contraseñas reales desde variables de entorno del hosting
+
+Resultado: 12 de 12 pruebas web satisfactorias.

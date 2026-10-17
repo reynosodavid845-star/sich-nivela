@@ -1,0 +1,19 @@
+flowchart TD
+    A(["Inicio 2.5 Registrar revisión<br/>(encargado de bodega)"]) --> B{"¿Hay<br/>herramientas<br/>por revisar?"}
+    B -->|No| B1[/"No hay herramientas<br/>que requieran revisión"/]
+    B1 --> Z1(["Volver al menú"])
+    B -->|Sí| B2[/"Mostrar dañadas, en reparación<br/>o que requieren revisión"/]
+    B2 --> C[["Seleccionar herramienta<br/>(código, nombre o apodo)"]]
+    C --> C1{"¿Canceló?"}
+    C1 -->|Sí| X1[/"Operación<br/>cancelada"/]
+    X1 --> Z2(["Volver al menú"])
+    C1 -->|No| D{"¿Dañada, requiere<br/>revisión o en<br/>reparación?"}
+    D -->|No| D1[/"No tiene daños ni<br/>revisión pendiente"/]
+    D1 --> Z3(["Volver al menú"])
+    D -->|Sí| D2{"¿Está en<br/>Bodega?"}
+    D2 -->|No| D3[/"Registre primero<br/>la devolución"/]
+    D3 --> Z4(["Volver al menú"])
+    D2 -->|Sí| E{"¿Motor o<br/>cable?"}
+    E -->|Sí| E1[/"Revise golpes, ruido y cable<br/>expuesto (memorando 14/02/2026)"/]
+    E1 --> P(("A"))
+    E -->|No| P

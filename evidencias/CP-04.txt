@@ -1,0 +1,115 @@
+Caso CP-04 - 2.1 Registrar salida
+Ejecutado: 16/10/2026 23:15
+----------------------------------------------------------------------
+============================================================
+ SICH - Sistema de Control de Herramientas
+ Nivela Obras Civiles, S.A.
+============================================================
+
+============================================================
+ SICH - INICIAR SESIÓN
+============================================================
+Usuario: jpivaral
+Contraseña: *********
+
+Bienvenido(a), Julián Pivaral - Encargado de bodega
+
+============================================================
+ SICH - MENÚ PRINCIPAL   (Julián Pivaral - Encargado de bodega)
+============================================================
+ 1. Catálogo de herramientas
+ 2. Movimientos de herramientas
+ 3. Consultas y seguimiento
+ 9. Cerrar sesión
+ 0. Salir
+Elija una opción: 2
+
+============================================================
+ 2. MOVIMIENTOS DE HERRAMIENTAS
+============================================================
+ 1. Registrar salida
+ 2. Registrar devolución
+ 3. Registrar traslado  [sin permiso]
+ 4. Reportar daño
+ 5. Registrar revisión
+ 6. Autorizar permanencia en obra  [sin permiso]
+ 0. Regresar al menú principal
+Elija una opción: 1
+
+============================================================
+ 2.1 REGISTRAR SALIDA DE HERRAMIENTA
+============================================================
+Escriba código, nombre o apodo (ej. bailarina) o 0 para cancelar: ABC-99
+No se encontró ninguna herramienta con 'ABC-99'. Intente con otro código, nombre o apodo.
+Escriba código, nombre o apodo (ej. bailarina) o 0 para cancelar: rotomartillo
+
+Se encontraron 3 herramientas con ese nombre o apodo:
+  1. ROT-01 - Rotomartillo (roto) | DISPONIBLE | Bodega
+  2. ROT-02 - Rotomartillo (roto) | ASIGNADA | EUC-022
+  3. ROT-03 - Rotomartillo (roto) | DISPONIBLE | Bodega
+Elija el número de la herramienta (0 = buscar otra vez): 1
+
+Obras activas:
+  - VN-014 - Villa Nueva - banqueta ingreso sur
+  - EUC-022 - Casa Eucaliptos - muro lateral
+  - Z11-009 - Zona 11 - reparación de drenaje
+Obra de destino (código, ej. VN-014): CIS-005
+La obra CIS-005 no está activa. Elija una obra de la lista.
+Obra de destino (código, ej. VN-014): XYZ-1
+La obra 'XYZ-1' no existe. Elija una obra de la lista.
+Obra de destino (código, ej. VN-014): EUC-022
+Responsable que recibe la herramienta: 
+Este campo es obligatorio. Escriba un valor.
+Responsable que recibe la herramienta: Luis Aguilar
+Fecha y hora de salida [Enter = 16/10/2026 23:15]: 32/13/2026 25:00
+Fecha inválida. Use el formato DD/MM/AAAA HH:MM (ej. 23/06/2026 06:15).
+Fecha y hora de salida [Enter = 16/10/2026 23:15]: 16/10/2026 06:15
+Fecha y hora esperada de devolución [Enter = 16/10/2026 17:00]: 16/10/2026 05:00
+La devolución esperada debe ser posterior a la salida.
+Fecha y hora esperada de devolución [Enter = 16/10/2026 17:00]: 16/10/2026 19:00
+Advertencia: la devolución queda fuera del horario 16:30-17:15.
+¿El residente autorizó este horario? (S/N): N
+Escriba otra fecha y hora de devolución.
+Fecha y hora esperada de devolución [Enter = 16/10/2026 17:00]: 16/10/2026 19:00
+Advertencia: la devolución queda fuera del horario 16:30-17:15.
+¿El residente autorizó este horario? (S/N): S
+Nombre del residente que autorizó: Ing. Esteban Cifuentes
+Observaciones (opcional, Enter para omitir): 
+
+--- Resumen de la operación ---
+  Herramienta: ROT-01 - Rotomartillo (roto) | DISPONIBLE | Bodega
+  Obra de destino: EUC-022 - Casa Eucaliptos - muro lateral
+  Responsable: Luis Aguilar
+  Salida: 16/10/2026 06:15
+  Devolución esperada: 16/10/2026 19:00
+  Horario autorizado por: Ing. Esteban Cifuentes
+-------------------------------
+¿Confirmar operación? (S/N): S
+
+Operación exitosa: salida registrada. ROT-01 quedó ASIGNADA en EUC-022 - Casa Eucaliptos - muro lateral, responsable Luis Aguilar, devolución esperada 16/10/2026 19:00.
+
+Presione Enter para volver al menú...
+
+============================================================
+ 2. MOVIMIENTOS DE HERRAMIENTAS
+============================================================
+ 1. Registrar salida
+ 2. Registrar devolución
+ 3. Registrar traslado  [sin permiso]
+ 4. Reportar daño
+ 5. Registrar revisión
+ 6. Autorizar permanencia en obra  [sin permiso]
+ 0. Regresar al menú principal
+Elija una opción: 0
+
+============================================================
+ SICH - MENÚ PRINCIPAL   (Julián Pivaral - Encargado de bodega)
+============================================================
+ 1. Catálogo de herramientas
+ 2. Movimientos de herramientas
+ 3. Consultas y seguimiento
+ 9. Cerrar sesión
+ 0. Salir
+Elija una opción: 0
+
+Gracias por usar SICH. Programa finalizado.

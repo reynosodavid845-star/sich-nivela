@@ -1,0 +1,14 @@
+[
+  {
+    "id": 1,
+    "codigo": "NIV-LAS-01",
+    "obra": "Z11-009",
+    "fecha_inicio": "2026-10-13 17:00",
+    "fecha_fin": "2026-12-31 17:00",
+    "residente": "Ing. Esteban Cifuentes",
+    "seguridad_confirmada": true,
+    "registrado_por": "ecifuentes",
+    "fecha_registro": "2026-10-13 16:00",
+    "observaciones": "El sitio tiene garita."
+  }
+]

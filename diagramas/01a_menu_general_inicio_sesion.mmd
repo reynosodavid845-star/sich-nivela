@@ -1,0 +1,22 @@
+flowchart TD
+    I(["Inicio: python main.py"]) --> C["cargar_datos(): leer los<br/>6 archivos JSON de datos/"]
+    C --> D{"¿Falta o está<br/>dañado algún<br/>archivo?"}
+    D -->|Sí| R["Recrear con datos<br/>iniciales y avisar"]
+    D -->|No| L0["intentos = 0"]
+    R --> L0
+    B(("B")) --> L0
+    L0 --> L1[/"Leer usuario<br/>y contraseña"/]
+    L1 --> L1A{"¿Algún campo<br/>vacío?"}
+    L1A -->|Sí| L1B[/"Este campo es<br/>obligatorio"/]
+    L1B --> L1
+    L1A -->|No| L2{"¿Credenciales<br/>correctas?"}
+    L2 -->|Sí| A(("A"))
+    L2 -->|No| L3["intentos = intentos + 1<br/>Usuario o contraseña incorrectos"]
+    L3 --> L4{"¿intentos = 3?"}
+    L4 -->|No| L6{"¿Desea intentar<br/>de nuevo? S/N"}
+    L6 -->|S| L1
+    L4 -->|Sí| L5[/"Se agotaron<br/>los 3 intentos"/]
+    L6 -->|N| FIN
+    L5 --> FIN
+    CC(("C")) --> FIN[/"Gracias por usar SICH.<br/>Programa finalizado."/]
+    FIN --> F(["Fin"])

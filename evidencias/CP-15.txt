@@ -1,0 +1,85 @@
+Caso CP-15 - 2.4 Reportar daño
+Ejecutado: 16/10/2026 23:15
+----------------------------------------------------------------------
+============================================================
+ SICH - Sistema de Control de Herramientas
+ Nivela Obras Civiles, S.A.
+============================================================
+
+============================================================
+ SICH - INICIAR SESIÓN
+============================================================
+Usuario: esantos
+Contraseña: **********
+
+Bienvenido(a), Erick Santos - Maestro de obra / personal de campo
+
+============================================================
+ SICH - MENÚ PRINCIPAL   (Erick Santos - Maestro de obra / personal de campo)
+============================================================
+ 1. Catálogo de herramientas
+ 2. Movimientos de herramientas
+ 3. Consultas y seguimiento
+ 9. Cerrar sesión
+ 0. Salir
+Elija una opción: 2
+
+============================================================
+ 2. MOVIMIENTOS DE HERRAMIENTAS
+============================================================
+ 1. Registrar salida  [sin permiso]
+ 2. Registrar devolución  [sin permiso]
+ 3. Registrar traslado  [sin permiso]
+ 4. Reportar daño
+ 5. Registrar revisión  [sin permiso]
+ 6. Autorizar permanencia en obra  [sin permiso]
+ 0. Regresar al menú principal
+Elija una opción: 4
+
+============================================================
+ 2.4 REPORTAR DAÑO
+============================================================
+Escriba código, nombre o apodo (ej. bailarina) o 0 para cancelar: COR-01
+Herramienta encontrada: PUL-03 - Cortadora de block (cortadora de block, pulidora grande, la makita azul, COR-01) | DISPONIBLE | Bodega
+Describa el daño (mínimo 5 caracteres): mal
+Debe escribir al menos 5 caracteres. Explique un poco más.
+Describa el daño (mínimo 5 caracteres): Se quebró el disco
+Fecha y hora del daño [Enter = 16/10/2026 23:15]: 
+Responsable (quién reporta o tenía la herramienta): 
+Este campo es obligatorio. Escriba un valor.
+Responsable (quién reporta o tenía la herramienta): Erick Santos
+
+--- Resumen de la operación ---
+  Herramienta: PUL-03 - Cortadora de block (cortadora de block, pulidora grande, la makita azul, COR-01) | DISPONIBLE | Bodega
+  Daño: Se quebró el disco
+  Fecha: 16/10/2026 23:15
+  Responsable: Erick Santos
+-------------------------------
+¿Confirmar operación? (S/N): N
+Operación cancelada. No se guardó ningún cambio.
+
+Presione Enter para volver al menú...
+
+============================================================
+ 2. MOVIMIENTOS DE HERRAMIENTAS
+============================================================
+ 1. Registrar salida  [sin permiso]
+ 2. Registrar devolución  [sin permiso]
+ 3. Registrar traslado  [sin permiso]
+ 4. Reportar daño
+ 5. Registrar revisión  [sin permiso]
+ 6. Autorizar permanencia en obra  [sin permiso]
+ 0. Regresar al menú principal
+Elija una opción: 0
+
+============================================================
+ SICH - MENÚ PRINCIPAL   (Erick Santos - Maestro de obra / personal de campo)
+============================================================
+ 1. Catálogo de herramientas
+ 2. Movimientos de herramientas
+ 3. Consultas y seguimiento
+ 9. Cerrar sesión
+ 0. Salir
+Elija una opción: 0
+
+Gracias por usar SICH. Programa finalizado.

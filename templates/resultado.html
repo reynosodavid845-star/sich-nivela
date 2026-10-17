@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block contenido %}
+<section class="tarjeta">
+  <h1>{{ titulo }}</h1>
+  <p class="alerta {% if exito %}exito{% else %}error{% endif %}" role="{% if exito %}status{% else %}alert{% endif %}">{{ mensaje }}</p>
+  {% if ofrecer_dano %}
+    <a class="boton-grande" href="{{ url_for('opcion', id_opcion='2.4', codigo=codigo) }}">Reportar el daño ahora</a>
+  {% endif %}
+  {% if exito and codigo %}
+    <a class="boton-grande secundario" href="{{ url_for('buscar', q=codigo) }}">Ver cómo quedó {{ codigo }}</a>
+  {% endif %}
+  <a class="boton-grande secundario" href="{{ url_for('operacion', id_opcion=id_opcion) }}">Hacer otro registro</a>
+  <a class="boton-grande secundario" href="{{ url_for('inicio') }}">Volver al menú</a>
+</section>
+{% endblock %}

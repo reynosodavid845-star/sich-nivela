@@ -1,0 +1,47 @@
+Caso CN-07 - Cerrar sesión, cambiar de usuario y salir
+Ejecutado: 16/10/2026 23:15
+----------------------------------------------------------------------
+============================================================
+ SICH - Sistema de Control de Herramientas
+ Nivela Obras Civiles, S.A.
+============================================================
+
+============================================================
+ SICH - INICIAR SESIÓN
+============================================================
+Usuario: jpivaral
+Contraseña: *********
+
+Bienvenido(a), Julián Pivaral - Encargado de bodega
+
+============================================================
+ SICH - MENÚ PRINCIPAL   (Julián Pivaral - Encargado de bodega)
+============================================================
+ 1. Catálogo de herramientas
+ 2. Movimientos de herramientas
+ 3. Consultas y seguimiento
+ 9. Cerrar sesión
+ 0. Salir
+Elija una opción: 9
+
+Sesión cerrada.
+
+============================================================
+ SICH - INICIAR SESIÓN
+============================================================
+Usuario: ecifuentes
+Contraseña: ************
+
+Bienvenido(a), Ing. Esteban Cifuentes - Residente de obra
+
+============================================================
+ SICH - MENÚ PRINCIPAL   (Ing. Esteban Cifuentes - Residente de obra)
+============================================================
+ 1. Catálogo de herramientas
+ 2. Movimientos de herramientas
+ 3. Consultas y seguimiento
+ 9. Cerrar sesión
+ 0. Salir
+Elija una opción: 0
+
+Gracias por usar SICH. Programa finalizado.

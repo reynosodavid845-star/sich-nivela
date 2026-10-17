@@ -1,0 +1,59 @@
+Caso CN-02 - Navegación: opción inválida
+Ejecutado: 16/10/2026 23:15
+----------------------------------------------------------------------
+============================================================
+ SICH - Sistema de Control de Herramientas
+ Nivela Obras Civiles, S.A.
+============================================================
+
+============================================================
+ SICH - INICIAR SESIÓN
+============================================================
+Usuario: jpivaral
+Contraseña: *********
+
+Bienvenido(a), Julián Pivaral - Encargado de bodega
+
+============================================================
+ SICH - MENÚ PRINCIPAL   (Julián Pivaral - Encargado de bodega)
+============================================================
+ 1. Catálogo de herramientas
+ 2. Movimientos de herramientas
+ 3. Consultas y seguimiento
+ 9. Cerrar sesión
+ 0. Salir
+Elija una opción: a
+Opción no válida, intente de nuevo.
+Elija una opción: 
+Opción no válida, intente de nuevo.
+Elija una opción: 7
+Opción no válida, intente de nuevo.
+Elija una opción: 2
+
+============================================================
+ 2. MOVIMIENTOS DE HERRAMIENTAS
+============================================================
+ 1. Registrar salida
+ 2. Registrar devolución
+ 3. Registrar traslado  [sin permiso]
+ 4. Reportar daño
+ 5. Registrar revisión
+ 6. Autorizar permanencia en obra  [sin permiso]
+ 0. Regresar al menú principal
+Elija una opción: 9
+Opción no válida, intente de nuevo.
+Elija una opción: x
+Opción no válida, intente de nuevo.
+Elija una opción: 0
+
+============================================================
+ SICH - MENÚ PRINCIPAL   (Julián Pivaral - Encargado de bodega)
+============================================================
+ 1. Catálogo de herramientas
+ 2. Movimientos de herramientas
+ 3. Consultas y seguimiento
+ 9. Cerrar sesión
+ 0. Salir
+Elija una opción: 0
+
+Gracias por usar SICH. Programa finalizado.

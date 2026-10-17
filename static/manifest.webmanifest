@@ -1,0 +1,27 @@
+{
+  "name": "SICH - Control de Herramientas",
+  "short_name": "SICH",
+  "description": "Sistema de Control de Herramientas de Nivela Obras Civiles: salidas, devoluciones, traslados, daños y búsqueda por apodo.",
+  "lang": "es",
+  "start_url": "/?origen=app",
+  "scope": "/",
+  "id": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f4f5f7",
+  "theme_color": "#0b4f8a",
+  "categories": ["business", "productivity", "utilities"],
+  "icons": [
+    {"src": "/static/iconos/icono-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "/static/iconos/icono-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "/static/iconos/icono-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ],
+  "shortcuts": [
+    {"name": "Buscar herramienta", "short_name": "Buscar", "url": "/buscar",
+     "icons": [{"src": "/static/iconos/icono-192.png", "sizes": "192x192"}]},
+    {"name": "Registrar salida", "short_name": "Salida", "url": "/opcion/2.1",
+     "icons": [{"src": "/static/iconos/icono-192.png", "sizes": "192x192"}]},
+    {"name": "Registrar devolución", "short_name": "Devolución", "url": "/opcion/2.2",
+     "icons": [{"src": "/static/iconos/icono-192.png", "sizes": "192x192"}]}
+  ]
+}

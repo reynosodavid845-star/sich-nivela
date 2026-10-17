@@ -1,0 +1,23 @@
+flowchart TD
+    P(("A")) --> G[/"Leer fin (Enter = día<br/>siguiente 06:15)"/]
+    G --> G1{"¿Fecha<br/>válida?"}
+    G1 -->|No| G2[/"Fecha inválida"/]
+    G2 --> G
+    G1 -->|Sí| G3{"¿Fin posterior<br/>al inicio?"}
+    G3 -->|No| G4[/"El fin debe ser<br/>posterior al inicio"/]
+    G4 --> G
+    G3 -->|Sí| H{"¿El sitio tiene<br/>seguridad? S/N"}
+    H -->|N| H1[/"Autorización rechazada:<br/>el sitio debe tener seguridad"/]
+    H1 --> Z1(["Volver al menú"])
+    H -->|S| I[/"Leer observaciones<br/>(opcional)"/]
+    I --> M[/"Mostrar resumen: obra,<br/>período, residente"/]
+    M --> N{"¿Confirmar<br/>operación?<br/>S/N"}
+    N -->|N| X[/"Operación cancelada.<br/>No se guardó<br/>ningún cambio."/]
+    X --> Z2(["Volver al menú"])
+    N -->|S| O{"¿Se cruza con<br/>otra autorización<br/>de esa obra?"}
+    O -->|Sí| O1[/"Ya existe la autorización N<br/>hasta la fecha indicada"/]
+    O1 --> Z3(["Volver al menú"])
+    O -->|No| Q["Guardar autorización por escrito<br/>(residente, período, seguridad)<br/>y movimiento tipo permanencia"]
+    Q --> Q1[("Guardar JSON")]
+    Q1 --> Q2[/"Operación exitosa: mientras esté<br/>vigente no se marcará vencida"/]
+    Q2 --> Z4(["Volver al menú"])

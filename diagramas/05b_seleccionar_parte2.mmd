@@ -1,0 +1,11 @@
+flowchart TD
+    P(("A")) --> G{"¿Cuántas<br/>coinciden?"}
+    G -->|1| R2(["Devolver esa<br/>herramienta"])
+    G -->|Más de 1| I[/"Mostrar lista numerada<br/>(ej. bailarina:<br/>COM-01 y COM-02)"/]
+    I --> J[/"Leer número<br/>(0 = buscar otra vez)"/]
+    J --> J1{"¿Número<br/>de la lista?"}
+    J1 -->|No| J2[/"Opción no válida,<br/>intente de nuevo"/]
+    J2 --> J
+    J1 -->|Sí| K{"¿Eligió 0?"}
+    K -->|Sí| B
+    K -->|No| R3(["Devolver la<br/>herramienta elegida"])

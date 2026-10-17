@@ -1,0 +1,26 @@
+flowchart TD
+    A(["Inicio 2.2 Registrar devolución<br/>(encargado de bodega)"]) --> B{"¿Hay<br/>herramientas<br/>en obra?"}
+    B -->|No| B1[/"No hay herramientas en obra<br/>pendientes de devolución"/]
+    B1 --> Z1(["Volver al menú"])
+    B -->|Sí| B2[/"Mostrar herramientas<br/>que están en obra"/]
+    B2 --> C[["Seleccionar herramienta<br/>(código, nombre o apodo)"]]
+    C --> C1{"¿Canceló?"}
+    C1 -->|Sí| X1[/"Operación<br/>cancelada"/]
+    X1 --> Z2(["Volver al menú"])
+    C1 -->|No| D{"¿Está en<br/>Bodega?"}
+    D -->|Sí| D1[/"Está en bodega: no tiene<br/>salida pendiente de devolución"/]
+    D1 --> Z3(["Volver al menú"])
+    D -->|No| E[/"Mostrar obra, responsable<br/>y fecha de salida"/]
+    E --> F[/"Leer fecha de devolución<br/>(Enter = actual)"/]
+    F --> F1{"¿Fecha<br/>válida?"}
+    F1 -->|No| F2[/"Fecha inválida"/]
+    F2 --> F
+    F1 -->|Sí| F3{"¿Anterior a<br/>la salida?"}
+    F3 -->|Sí| F4[/"No puede ser anterior<br/>a la salida"/]
+    F4 --> F
+    F3 -->|No| G[/"Leer estado recibido:<br/>1 Bueno / 2 Con daño"/]
+    G --> G1{"¿1 o 2?"}
+    G1 -->|No| G2[/"Opción no válida,<br/>intente de nuevo"/]
+    G2 --> G
+    G1 -->|Sí| H[/"Leer observaciones<br/>(opcional)"/]
+    H --> P(("A"))

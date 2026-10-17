@@ -1,0 +1,17 @@
+flowchart TD
+    P(("A")) --> F[/"Leer fecha y hora del daño<br/>(Enter = actual)"/]
+    F --> F1{"¿Fecha<br/>válida?"}
+    F1 -->|No| F2[/"Fecha inválida"/]
+    F2 --> F
+    F1 -->|Sí| G[/"Leer responsable (quién<br/>reporta o la tenía)"/]
+    G --> G1{"¿Vacío?"}
+    G1 -->|Sí| G2[/"Este campo es<br/>obligatorio"/]
+    G2 --> G
+    G1 -->|No| M[/"Mostrar resumen"/]
+    M --> N{"¿Confirmar<br/>operación?<br/>S/N"}
+    N -->|N| X[/"Operación cancelada.<br/>No se guardó<br/>ningún cambio."/]
+    X --> Z1(["Volver al menú"])
+    N -->|S| O["registrar_dano(): crear reporte<br/>con id; estado = dañada;<br/>movimiento tipo daño"]
+    O --> O1[("Guardar JSON")]
+    O1 --> O2[/"Operación exitosa: queda<br/>DAÑADA y bloqueada para salir"/]
+    O2 --> Z2(["Volver al menú"])

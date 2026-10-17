@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block contenido %}
+<h1>{{ titulo }}</h1>
+<nav class="lista-botones" aria-label="{{ titulo }}">
+  {% for op in opciones %}
+    <a class="boton-grande {% if not op.permiso or not op.implementada %}apagado{% endif %}"
+       href="{{ url_for('opcion', id_opcion=op.id) }}">
+      {{ op.id }} {{ op.texto }}
+      {% if not op.permiso %}<small>Sin permiso para su rol</small>
+      {% elif not op.implementada %}<small>Pendiente (Fase 4)</small>{% endif %}
+    </a>
+  {% endfor %}
+  <a class="boton-grande secundario" href="{{ url_for('inicio') }}">0. Regresar al menú principal</a>
+</nav>
+{% endblock %}

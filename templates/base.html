@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b4f8a">
+  <title>{% if titulo %}{{ titulo }} · {% endif %}SICH</title>
+  <meta name="description" content="SICH: control de herramientas de Nivela Obras Civiles.">
+  <link rel="manifest" href="{{ url_for('manifiesto') }}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='iconos/favicon-32.png') }}">
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='iconos/apple-touch-icon.png') }}">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="SICH">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="stylesheet" href="{{ url_for('static', filename='estilos.css') }}?v={{ version }}">
+  <script src="{{ url_for('static', filename='sich.js') }}?v={{ version }}" defer></script>
+</head>
+<body>
+  <a class="saltar" href="#contenido">Saltar al contenido</a>
+  <header class="barra">
+    <a class="marca" href="{{ url_for('inicio') }}" aria-label="SICH, ir al inicio">SICH</a>
+    {% if usuario %}
+      <span class="quien">{{ usuario.nombre }} · {{ rol }}</span>
+      <a class="boton-chico" href="{{ url_for('salir') }}">Cerrar sesión</a>
+    {% endif %}
+  </header>
+  {% if usuario %}
+  <form class="busqueda" action="{{ url_for('buscar') }}" method="get" role="search">
+    <label for="q" class="oculto">Buscar herramienta por código, nombre o apodo</label>
+    <input id="q" name="q" type="search" value="{{ texto or '' }}" maxlength="60"
+           placeholder="Código, nombre o apodo (ej. bailarina)" autocomplete="off" enterkeyhint="search">
+    <button type="submit">Buscar</button>
+  </form>
+  {% endif %}
+  <main id="contenido">
+    {% if migas %}
+    <nav class="migas" aria-label="Usted está en">
+      <a href="{{ url_for('inicio') }}">Inicio</a>
+      {% for texto_miga, enlace in migas %}
+        <span aria-hidden="true">›</span>
+        {% if enlace %}<a href="{{ enlace }}">{{ texto_miga }}</a>{% else %}<span aria-current="page">{{ texto_miga }}</span>{% endif %}
+      {% endfor %}
+    </nav>
+    {% endif %}
+    {% with mensajes = get_flashed_messages(with_categories=true) %}
+      {% for categoria, mensaje in mensajes %}
+        <p class="alerta {{ categoria }}" role="status">{{ mensaje }}</p>
+      {% endfor %}
+    {% endwith %}
+    {% block contenido %}{% endblock %}
+  </main>
+  <footer>
+    <button id="boton-instalar" class="boton-chico" type="button" hidden>Instalar app</button>
+    <a href="{{ url_for('instalar') }}">¿Cómo instalar SICH en el teléfono?</a>
+    <p>SICH · Nivela Obras Civiles, S.A. · Grupo 10 · Datos de prueba</p>
+  </footer>
+</body>
+</html>

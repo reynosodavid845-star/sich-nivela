@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block contenido %}
+{% for aviso in avisos %}<p class="alerta aviso">{{ aviso }}</p>{% endfor %}
+<p class="suave saludo">Hoy: {{ hoy }}</p>
+<section class="tablero" aria-label="Resumen de herramientas">
+  <div class="cuadro estado-disponible"><span class="numero">{{ resumen.disponibles }}</span>
+    <span class="nombre">Disponibles</span><small>Listas en bodega</small></div>
+  <div class="cuadro estado-asignada"><span class="numero">{{ resumen.asignadas }}</span>
+    <span class="nombre">Asignadas en obra</span><small>Con responsable</small></div>
+  <div class="cuadro estado-vencida"><span class="numero">{{ resumen.vencidas }}</span>
+    <span class="nombre">Pendientes vencidas</span><small>Pasó su hora y sin permiso</small></div>
+  <div class="cuadro estado-danada"><span class="numero">{{ resumen.danadas }}</span>
+    <span class="nombre">Dañadas / en revisión</span><small>No pueden salir</small></div>
+</section>
+
+{% if rapidos %}
+<h2>¿Qué necesita hacer?</h2>
+<nav class="rapidos" aria-label="Accesos rápidos">
+  {% for id_opcion, texto_rapido in rapidos %}
+    <a class="boton-grande" href="{{ url_for('opcion', id_opcion=id_opcion) }}">{{ texto_rapido }}
+      <small>Opción {{ id_opcion }}</small></a>
+  {% endfor %}
+</nav>
+{% endif %}
+
+<h2>Menú principal</h2>
+<nav class="lista-botones" aria-label="Menú principal">
+  {% for numero, texto_menu in menu %}
+    <a class="boton-grande secundario" href="{{ url_for('submenu', numero=numero) }}">{{ numero }}. {{ texto_menu }}</a>
+  {% endfor %}
+  <a class="boton-grande secundario" href="{{ url_for('salir') }}">9. Cerrar sesión</a>
+  <a class="boton-grande secundario" href="{{ url_for('salir') }}">0. Salir</a>
+</nav>
+{% endblock %}
