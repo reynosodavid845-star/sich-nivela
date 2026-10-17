@@ -4,6 +4,9 @@
 Grupo No. 10 · Expediente-001 · Algoritmos y Programación Básica · Universidad del Valle de Guatemala
 Empresa del caso: Nivela Obras Civiles, S.A.
 
+**App publicada:** https://sich-nivela.onrender.com (instalable en celulares y tablets;
+ver `/instalar`). Código: https://github.com/reynosodavid845-star/sich-nivela
+
 Integrantes: Jaime Sebastián Duarte Tejada (26346), José Carlos Ipiña León (26284),
 Julián Alejandro Flores Villatoro (26675), Jesús David Reynoso Beteta (261295).
 
