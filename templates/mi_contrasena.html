@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block contenido %}
+<section class="tarjeta angosta">
+  <h1>Mi contraseña</h1>
+  {% if resultado %}
+    <p class="alerta {% if resultado[0] %}exito{% else %}error{% endif %}" role="{% if resultado[0] %}status{% else %}alert{% endif %}">{{ resultado[1] }}</p>
+  {% endif %}
+  <form method="post" class="formulario">
+    <input type="hidden" name="token" value="{{ token }}">
+    <input type="text" name="usuario" value="{{ usuario.usuario }}" autocomplete="username" hidden>
+    <label for="actual">Contraseña actual</label>
+    <input id="actual" name="actual" type="password" required autocomplete="current-password">
+    <label for="nueva">Contraseña nueva (mínimo 8 caracteres)</label>
+    <div class="con-boton">
+      <input id="nueva" name="nueva" type="password" required minlength="8" autocomplete="new-password">
+      <button type="button" class="boton-ver" data-mostrar="nueva" aria-pressed="false">Ver</button>
+    </div>
+    <label for="repetida">Repita la contraseña nueva</label>
+    <input id="repetida" name="repetida" type="password" required minlength="8" autocomplete="new-password">
+    <button class="boton-grande" type="submit" data-enviando="Guardando...">Cambiar contraseña</button>
+  </form>
+  <a class="boton-grande secundario" href="{{ url_for('inicio') }}">Volver al menú</a>
+</section>
+{% endblock %}

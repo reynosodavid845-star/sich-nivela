@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block contenido %}
+<section class="tarjeta angosta">
+  <h1>Configurar propietario</h1>
+  <p class="suave">Este paso se hace una sola vez. La cuenta de propietario puede crear las
+    demás cuentas, restablecer contraseñas y desactivar accesos.</p>
+  {% if error %}<p class="alerta error" role="alert">{{ error }}</p>{% endif %}
+  {% if minutos_bloqueo > 0 %}
+    <p class="alerta error" role="alert">Demasiados intentos con un código incorrecto. Espere
+      {{ minutos_bloqueo }} minuto(s).</p>
+  {% else %}
+  <details class="ayuda-codigo">
+    <summary>¿Dónde encuentro el código de configuración?</summary>
+    <ul>
+      <li><strong>PythonAnywhere:</strong> pestaña <em>Files</em> → carpeta
+        <code>sich-nivela/datos</code> → archivo <code>codigo_configuracion.txt</code>.</li>
+      <li><strong>Render:</strong> su servicio → <em>Logs</em> → línea
+        «codigo de configuracion del propietario».</li>
+      <li><strong>En su computadora:</strong> carpeta <code>datos</code> del proyecto →
+        <code>codigo_configuracion.txt</code>.</li>
+    </ul>
+  </details>
+  <form method="post" class="formulario">
+    <input type="hidden" name="token" value="{{ token }}">
+    <label for="codigo">Código de configuración</label>
+    <input id="codigo" name="codigo" required autocomplete="off" autocapitalize="characters"
+           value="{{ valores.codigo or '' }}" maxlength="20">
+    <label for="nombre">Su nombre</label>
+    <input id="nombre" name="nombre" required value="{{ valores.nombre or '' }}" maxlength="80">
+    <label for="usuario">Usuario para entrar</label>
+    <input id="usuario" name="usuario" required autocomplete="username" autocapitalize="none"
+           spellcheck="false" value="{{ valores.usuario or '' }}" maxlength="20">
+    <small class="ayuda">Entre 3 y 20 letras sin tilde o números. Ej.: <code>dueno</code></small>
+    <label for="contrasena">Contraseña (mínimo 8 caracteres)</label>
+    <div class="con-boton">
+      <input id="contrasena" name="contrasena" type="password" required minlength="8"
+             autocomplete="new-password">
+      <button type="button" class="boton-ver" data-mostrar="contrasena" aria-pressed="false">Ver</button>
+    </div>
+    <label for="repetida">Repita la contraseña</label>
+    <input id="repetida" name="repetida" type="password" required minlength="8" autocomplete="new-password">
+    <small class="ayuda">Al guardar, el navegador le ofrecerá recordar la contraseña: acepte.</small>
+    <button class="boton-grande" type="submit" data-enviando="Creando...">Crear cuenta de propietario</button>
+  </form>
+  {% endif %}
+</section>
+{% endblock %}

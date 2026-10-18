@@ -22,7 +22,11 @@
     <a class="marca" href="{{ url_for('inicio') }}" aria-label="SICH, ir al inicio">SICH</a>
     {% if usuario %}
       <span class="quien">{{ usuario.nombre }} · {{ rol }}</span>
-      <a class="boton-chico" href="{{ url_for('salir') }}">Cerrar sesión</a>
+      <nav class="enlaces-cuenta" aria-label="Mi cuenta">
+        {% if usuario.rol == 'propietario' %}<a href="{{ url_for('administrar_cuentas') }}">Cuentas</a>{% endif %}
+        <a href="{{ url_for('mi_contrasena') }}">Mi contraseña</a>
+        <a class="boton-chico" href="{{ url_for('salir') }}">Cerrar sesión</a>
+      </nav>
     {% endif %}
   </header>
   {% if usuario %}

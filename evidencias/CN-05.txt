@@ -1,5 +1,5 @@
 Caso CN-05 - Inicio de sesión: credenciales incorrectas y reintento
-Ejecutado: 16/10/2026 23:15
+Ejecutado: 17/10/2026 19:10
 ----------------------------------------------------------------------
 ============================================================
  SICH - Sistema de Control de Herramientas

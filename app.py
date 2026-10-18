@@ -21,6 +21,7 @@ from sich.autenticacion import MAXIMO_INTENTOS, MENSAJE_SIN_PERMISO, NOMBRES_ROL
     tiene_permiso, verificar_credenciales
 from sich.busqueda import buscar_con_detalle
 from sich.catalogo import descripcion_corta, nombre_obra, obras_activas, obtener_herramienta
+from sich import cuentas
 from sich.consultas import detalle_herramienta, resumen_tablero
 from sich.datos import cargar_datos, cifrar_contrasena, guardar_datos, usuarios_iniciales
 from sich.menus import MENSAJE_PENDIENTE, MENU_PRINCIPAL, SUBMENUS, esta_implementada
@@ -44,7 +45,7 @@ app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 3600       # el navegador guarda CSS y
 app.config["SESSION_COOKIE_SECURE"] = PUBLICO
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(hours=12)   # un turno de trabajo
 
-VERSION_ESTATICOS = "4"          # cambiarla obliga al navegador a bajar el CSS/JS nuevo
+VERSION_ESTATICOS = "5"          # cambiarla obliga al navegador a bajar el CSS/JS nuevo
 FORMATO_WEB = "%Y-%m-%dT%H:%M"   # formato de <input type="datetime-local">
 MINUTOS_BLOQUEO = 5              # espera después de 3 intentos fallidos de inicio de sesión
 CARPETA_ESTATICA = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
@@ -78,6 +79,9 @@ def aplicar_contrasenas_de_entorno():
 
 
 aplicar_contrasenas_de_entorno()
+if PUBLICO:
+    # Si todavía no hay propietario, deja el código de configuración en el registro (Logs).
+    cuentas.codigo_de_configuracion(cargar_datos()[0])
 
 PERSONAL = ["Erick Santos", "Luis Aguilar", "Julián Pivaral", "Ing. Esteban Cifuentes"]
 
@@ -147,7 +151,7 @@ def usuario_actual(datos):
     """Devuelve el usuario con sesión iniciada, o None."""
     nombre = session.get("usuario")
     for usuario in datos["usuarios"]:
-        if usuario["usuario"] == nombre:
+        if usuario["usuario"] == nombre and usuario.get("activo", True):
             return usuario
     return None
 
@@ -401,7 +405,118 @@ def login():
             error = ("Usuario o contraseña incorrectos. Le quedan "
                      + str(MAXIMO_INTENTOS - intentos) + " intento(s).")
     return render_template("login.html", error=error, minutos_bloqueo=minutos, avisos=avisos,
-                           nombre_escrito=nombre_escrito)
+                           nombre_escrito=nombre_escrito,
+                           falta_propietario=not cuentas.hay_propietario(datos))
+
+
+# ------------------------------------------------- cuentas y propietario
+
+def es_contrasena_de_prueba(contrasena):
+    """True si es una de las contraseñas de prueba publicadas en el README."""
+    return cifrar_contrasena(contrasena) in CONTRASENAS_DE_PRUEBA
+
+
+@app.route("/configurar", methods=["GET", "POST"])
+def configurar():
+    """Crea la PRIMERA cuenta de propietario con el código de configuración del servidor."""
+    datos, avisos = cargar_datos()
+    if cuentas.hay_propietario(datos):
+        flash("El propietario ya está configurado. Inicie sesión.", "aviso")
+        return redirect(url_for("login"))
+    cuentas.codigo_de_configuracion(datos)   # lo genera y lo escribe en el Log si no existe
+    ip = ip_del_cliente()
+    minutos = tiempo_de_bloqueo_restante(ip)
+    error = ""
+    valores = {}
+    if request.method == "POST" and minutos == 0:
+        valores = request.form.to_dict()
+        contrasena = valores.get("contrasena", "")
+        if PUBLICO and es_contrasena_de_prueba(contrasena):
+            error = "No use una contraseña de prueba."
+        else:
+            exito, mensaje = cuentas.crear_propietario_inicial(
+                datos, valores.get("codigo", ""), valores.get("usuario", ""),
+                valores.get("nombre", ""), contrasena, valores.get("repetida", ""))
+            if exito:
+                guardar_datos(datos)
+                INTENTOS_POR_IP.pop(ip, None)
+                session.clear()
+                session.permanent = True
+                session["usuario"] = valores["usuario"].strip().lower()
+                flash(mensaje, "exito")
+                return redirect(url_for("administrar_cuentas"))
+            error = mensaje
+            if "código" in mensaje:
+                registrar_intento_fallido(ip)
+                minutos = tiempo_de_bloqueo_restante(ip)
+    valores.pop("contrasena", None)
+    valores.pop("repetida", None)
+    return render_template("configurar.html", usuario=None, titulo="Configurar propietario",
+                           error=error, valores=valores, minutos_bloqueo=minutos)
+
+
+@app.route("/cuentas", methods=["GET", "POST"])
+def administrar_cuentas():
+    """Panel del propietario: crear cuentas, restablecer contraseñas, activar o desactivar."""
+    datos, avisos = cargar_datos()
+    usuario = usuario_actual(datos)
+    if usuario is None:
+        return ir_a_login()
+    if not cuentas.es_propietario(usuario):
+        return pagina_mensaje(datos, usuario, "Administrar cuentas",
+                              "Solo el propietario puede administrar las cuentas.", "error")
+    resultado = None
+    valores = {}
+    if request.method == "POST":
+        accion = request.form.get("accion", "")
+        objetivo = request.form.get("usuario", "")
+        contrasena = request.form.get("contrasena", "")
+        repetida = request.form.get("repetida", "")
+        if contrasena != "" and PUBLICO and es_contrasena_de_prueba(contrasena):
+            resultado = (False, "No use una contraseña de prueba.")
+        elif accion == "crear":
+            valores = request.form.to_dict()
+            resultado = cuentas.crear_usuario(datos, usuario, objetivo, request.form.get("nombre", ""),
+                                              request.form.get("rol", ""), contrasena, repetida,
+                                              request.form.get("obra", ""))
+        elif accion == "restablecer":
+            resultado = cuentas.restablecer_contrasena(datos, usuario, objetivo, contrasena, repetida)
+        elif accion in ["activar", "desactivar"]:
+            resultado = cuentas.cambiar_estado(datos, usuario, objetivo, accion == "activar")
+        else:
+            resultado = (False, "Opción no válida, intente de nuevo.")
+        if resultado[0]:
+            guardar_datos(datos)
+            valores = {}
+        valores.pop("contrasena", None)
+        valores.pop("repetida", None)
+    lista = sorted(datos["usuarios"], key=lambda u: (u["rol"] != "propietario", u["usuario"]))
+    return render_template("cuentas.html", usuario=usuario, rol=NOMBRES_ROL[usuario["rol"]],
+                           titulo="Administrar cuentas", cuentas=lista, roles=NOMBRES_ROL,
+                           obras=opciones_obras(datos), resultado=resultado, valores=valores,
+                           migas=[("Administrar cuentas", "")])
+
+
+@app.route("/mi-contrasena", methods=["GET", "POST"])
+def mi_contrasena():
+    """Cualquier usuario cambia su propia contraseña."""
+    datos, avisos = cargar_datos()
+    usuario = usuario_actual(datos)
+    if usuario is None:
+        return ir_a_login()
+    resultado = None
+    if request.method == "POST":
+        nueva = request.form.get("nueva", "")
+        if PUBLICO and es_contrasena_de_prueba(nueva):
+            resultado = (False, "No use una contraseña de prueba.")
+        else:
+            resultado = cuentas.cambiar_mi_contrasena(datos, usuario, request.form.get("actual", ""),
+                                                      nueva, request.form.get("repetida", ""))
+            if resultado[0]:
+                guardar_datos(datos)
+    return render_template("mi_contrasena.html", usuario=usuario, rol=NOMBRES_ROL[usuario["rol"]],
+                           titulo="Mi contraseña", resultado=resultado,
+                           migas=[("Mi contraseña", "")])
 
 
 # ------------------------------------------------- app instalable (PWA)
@@ -459,6 +574,7 @@ def inicio():
     return render_template("inicio.html", usuario=usuario, rol=NOMBRES_ROL[usuario["rol"]],
                            resumen=resumen_tablero(datos), menu=MENU_PRINCIPAL[:3],
                            avisos=avisos, rapidos=rapidos,
+                           es_propietario=cuentas.es_propietario(usuario),
                            hoy=movimientos.momento_actual(None).strftime("%d/%m/%Y %H:%M"))
 
 

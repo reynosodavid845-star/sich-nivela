@@ -1,5 +1,5 @@
 Caso CP-05 - 2.1 Registrar salida
-Ejecutado: 16/10/2026 23:15
+Ejecutado: 17/10/2026 19:10
 ----------------------------------------------------------------------
 ============================================================
  SICH - Sistema de Control de Herramientas
@@ -48,7 +48,7 @@ Obras activas:
   - Z11-009 - Zona 11 - reparación de drenaje
 Obra de destino (código, ej. VN-014): Z11-009
 Responsable que recibe la herramienta: Erick Santos
-Fecha y hora de salida [Enter = 16/10/2026 23:15]: 16/10/2026 06:15
+Fecha y hora de salida [Enter = 17/10/2026 19:10]: 16/10/2026 06:15
 Fecha y hora esperada de devolución [Enter = 16/10/2026 17:00]: 16/10/2026 17:00
 Observaciones (opcional, Enter para omitir): 
 

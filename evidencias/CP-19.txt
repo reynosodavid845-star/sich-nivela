@@ -1,5 +1,5 @@
 Caso CP-19 - 2.6 Autorizar permanencia en obra
-Ejecutado: 16/10/2026 23:15
+Ejecutado: 17/10/2026 19:10
 ----------------------------------------------------------------------
 ============================================================
  SICH - Sistema de Control de Herramientas
@@ -46,7 +46,7 @@ Herramientas que están en obra:
 Escriba código, nombre o apodo (ej. bailarina) o 0 para cancelar: MEZ-01
 Herramienta encontrada: MEZ-01 - Mezcladora grande (trompo, mezcladora grande) | ASIGNADA | VN-014
 Obra donde se quedará: VN-014 - Villa Nueva - banqueta ingreso sur
-Inicio de la permanencia [Enter = 16/10/2026 23:15]: 16/10/2026 17:00
+Inicio de la permanencia [Enter = 17/10/2026 19:10]: 16/10/2026 17:00
 Fin de la permanencia [Enter = 17/10/2026 06:15]: 19/10/2026 06:15
 ¿Confirma que el sitio tiene seguridad (garita, guardián o bodega con llave)? (S/N): S
 Observaciones (opcional, Enter para omitir): Cliente tiene garita

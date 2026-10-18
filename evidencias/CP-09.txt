@@ -1,5 +1,5 @@
 Caso CP-09 - 2.2 Registrar devolución
-Ejecutado: 16/10/2026 23:15
+Ejecutado: 17/10/2026 19:10
 ----------------------------------------------------------------------
 ============================================================
  SICH - Sistema de Control de Herramientas
@@ -46,7 +46,7 @@ Herramientas que están en obra:
 Escriba código, nombre o apodo (ej. bailarina) o 0 para cancelar: ROT-02
 Herramienta encontrada: ROT-02 - Rotomartillo (roto) | ASIGNADA | EUC-022
 Salió a EUC-022 - Casa Eucaliptos - muro lateral con Erick Santos el 14/10/2026 06:15
-Fecha y hora de devolución [Enter = 16/10/2026 23:15]: 16/10/2026 16:50
+Fecha y hora de devolución [Enter = 17/10/2026 19:10]: 16/10/2026 16:50
 Estado en que se recibe:  1. Bueno   2. Con daño
 Elija 1 o 2: 1
 Observaciones (ej. ruido raro, golpe; Enter para omitir): Hace ruido raro

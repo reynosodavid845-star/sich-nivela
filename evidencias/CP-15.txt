@@ -1,5 +1,5 @@
 Caso CP-15 - 2.4 Reportar daño
-Ejecutado: 16/10/2026 23:15
+Ejecutado: 17/10/2026 19:10
 ----------------------------------------------------------------------
 ============================================================
  SICH - Sistema de Control de Herramientas
@@ -44,7 +44,7 @@ Herramienta encontrada: PUL-03 - Cortadora de block (cortadora de block, pulidor
 Describa el daño (mínimo 5 caracteres): mal
 Debe escribir al menos 5 caracteres. Explique un poco más.
 Describa el daño (mínimo 5 caracteres): Se quebró el disco
-Fecha y hora del daño [Enter = 16/10/2026 23:15]: 
+Fecha y hora del daño [Enter = 17/10/2026 19:10]: 
 Responsable (quién reporta o tenía la herramienta): 
 Este campo es obligatorio. Escriba un valor.
 Responsable (quién reporta o tenía la herramienta): Erick Santos
@@ -52,7 +52,7 @@ Responsable (quién reporta o tenía la herramienta): Erick Santos
 --- Resumen de la operación ---
   Herramienta: PUL-03 - Cortadora de block (cortadora de block, pulidora grande, la makita azul, COR-01) | DISPONIBLE | Bodega
   Daño: Se quebró el disco
-  Fecha: 16/10/2026 23:15
+  Fecha: 17/10/2026 19:10
   Responsable: Erick Santos
 -------------------------------
 ¿Confirmar operación? (S/N): N

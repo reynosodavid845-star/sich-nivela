@@ -211,3 +211,17 @@ a, button { -webkit-tap-highlight-color: rgba(11, 79, 138, .15); }
   #boton-instalar { display: none; }
 }
 .centrado { text-align: center; }
+
+/* ---------- Cuentas y propietario ---------- */
+.enlaces-cuenta { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.enlaces-cuenta a:not(.boton-chico) { color: #fff; font-size: 15px; }
+.boton-grande.propietario { background: #2d2a6e; border-color: #2d2a6e; }
+.en-linea { display: inline; }
+details { margin: 8px 0; }
+details > summary { list-style: none; cursor: pointer; width: auto; }
+details > summary::-webkit-details-marker { display: none; }
+details[open] > summary { margin-bottom: 6px; }
+.ayuda-codigo summary { color: var(--primario); text-decoration: underline; }
+.ayuda-codigo ul { padding-left: 20px; font-size: 16px; }
+code { background: #eef1f5; padding: 1px 5px; border-radius: 4px; }
+h3 { font-size: 19px; margin: 2px 0 8px; }

@@ -1,5 +1,5 @@
 Caso CN-07 - Cerrar sesión, cambiar de usuario y salir
-Ejecutado: 16/10/2026 23:15
+Ejecutado: 17/10/2026 19:10
 ----------------------------------------------------------------------
 ============================================================
  SICH - Sistema de Control de Herramientas

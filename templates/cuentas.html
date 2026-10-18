@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block contenido %}
+<h1>Administrar cuentas</h1>
+{% if resultado %}
+  <p class="alerta {% if resultado[0] %}exito{% else %}error{% endif %}" role="{% if resultado[0] %}status{% else %}alert{% endif %}">{{ resultado[1] }}</p>
+{% endif %}
+
+<section class="tarjeta">
+  <h2>Crear una cuenta nueva</h2>
+  <form method="post" class="formulario">
+    <input type="hidden" name="token" value="{{ token }}">
+    <input type="hidden" name="accion" value="crear">
+    <label for="nuevo-nombre">Nombre de la persona</label>
+    <input id="nuevo-nombre" name="nombre" required maxlength="80" value="{{ valores.nombre or '' }}">
+    <label for="nuevo-usuario">Usuario para entrar</label>
+    <input id="nuevo-usuario" name="usuario" required maxlength="20" autocapitalize="none"
+           spellcheck="false" autocomplete="off" value="{{ valores.usuario or '' }}">
+    <small class="ayuda">Entre 3 y 20 letras sin tilde o números. Ej.: <code>luis.aguilar</code></small>
+    <label for="nuevo-rol">Rol</label>
+    <select id="nuevo-rol" name="rol" required>
+      {% for clave, texto_rol in roles.items() %}
+        <option value="{{ clave }}" {% if valores.rol == clave or (not valores.rol and clave == 'gerente') %}selected{% endif %}>{{ texto_rol }}</option>
+      {% endfor %}
+    </select>
+    <small class="ayuda">«Gerente» solo puede consultar: es el más seguro para mostrar la app.</small>
+    <div class="campo" id="caja-obra">
+      <label for="nuevo-obra">Obra (solo para maestro de obra)</label>
+      <select id="nuevo-obra" name="obra">
+        <option value="">—</option>
+        {% for valor, texto_obra in obras %}<option value="{{ valor }}" {% if valores.obra == valor %}selected{% endif %}>{{ texto_obra }}</option>{% endfor %}
+      </select>
+    </div>
+    <label for="nuevo-contrasena">Contraseña inicial (mínimo 8 caracteres)</label>
+    <div class="con-boton">
+      <input id="nuevo-contrasena" name="contrasena" type="password" required minlength="8" autocomplete="new-password">
+      <button type="button" class="boton-ver" data-mostrar="nuevo-contrasena" aria-pressed="false">Ver</button>
+    </div>
+    <label for="nuevo-repetida">Repita la contraseña</label>
+    <input id="nuevo-repetida" name="repetida" type="password" required minlength="8" autocomplete="new-password">
+    <button class="boton-grande" type="submit" data-enviando="Creando...">Crear cuenta</button>
+  </form>
+</section>
+
+<h2>Cuentas ({{ cuentas|length }})</h2>
+<div class="resultados">
+{% for c in cuentas %}
+  <article class="tarjeta">
+    <h3>{{ c.nombre }}
+      {% if c.get('activo', True) %}<span class="etiqueta estado-disponible">ACTIVA</span>
+      {% else %}<span class="etiqueta estado-vencida">DESACTIVADA</span>{% endif %}
+    </h3>
+    <dl>
+      <dt>Usuario</dt><dd><code>{{ c.usuario }}</code></dd>
+      <dt>Rol</dt><dd>{{ roles[c.rol] }}</dd>
+      {% if c.obra %}<dt>Obra</dt><dd>{{ c.obra }}</dd>{% endif %}
+    </dl>
+    <details>
+      <summary class="boton secundario">Restablecer contraseña</summary>
+      <form method="post" class="formulario">
+        <input type="hidden" name="token" value="{{ token }}">
+        <input type="hidden" name="accion" value="restablecer">
+        <input type="hidden" name="usuario" value="{{ c.usuario }}">
+        <label for="r-{{ c.usuario }}">Contraseña nueva (mínimo 8)</label>
+        <input id="r-{{ c.usuario }}" name="contrasena" type="password" required minlength="8" autocomplete="new-password">
+        <label for="r2-{{ c.usuario }}">Repítala</label>
+        <input id="r2-{{ c.usuario }}" name="repetida" type="password" required minlength="8" autocomplete="new-password">
+        <button class="boton" type="submit">Guardar contraseña de {{ c.usuario }}</button>
+      </form>
+    </details>
+    {% if c.usuario != usuario.usuario %}
+    <form method="post" class="en-linea">
+      <input type="hidden" name="token" value="{{ token }}">
+      <input type="hidden" name="usuario" value="{{ c.usuario }}">
+      {% if c.get('activo', True) %}
+        <button class="boton secundario" type="submit" name="accion" value="desactivar">Desactivar acceso</button>
+      {% else %}
+        <button class="boton" type="submit" name="accion" value="activar">Activar acceso</button>
+      {% endif %}
+    </form>
+    {% endif %}
+  </article>
+{% endfor %}
+</div>
+<a class="boton-grande secundario" href="{{ url_for('inicio') }}">Volver al menú</a>
+{% endblock %}

@@ -179,6 +179,93 @@ def caso_contrasenas_de_entorno():
         del os.environ["SICH_CONTRASENA_ECIFUENTES"]
 
 
+def entrar(usuario, contrasena):
+    """Cliente con sesión iniciada; devuelve (cliente, texto de la página de llegada)."""
+    c = aplicacion.app.test_client()
+    r = c.post("/login", data={"usuario": usuario, "contrasena": contrasena,
+                               "token": token_de(c.get("/login"))}, follow_redirects=True)
+    return c, texto_de(r)
+
+
+def crear_propietario_de_prueba():
+    """Configura el primer propietario con el código del archivo. Devuelve el cliente."""
+    from sich import cuentas
+    c = aplicacion.app.test_client()
+    pagina = c.get("/configurar")
+    with open(cuentas.ruta_codigo(), encoding="utf-8") as archivo:
+        codigo = archivo.read().strip()
+    r = c.post("/configurar", data={"codigo": codigo, "nombre": "Dueño de Prueba", "usuario": "dueno",
+                                    "contrasena": "Dueno-2026!", "repetida": "Dueno-2026!",
+                                    "token": token_de(pagina)}, follow_redirects=True)
+    return c, texto_de(r)
+
+
+def caso_configurar_propietario():
+    from sich import cuentas
+    c = aplicacion.app.test_client()
+    aviso = "Configúrela aquí" in texto_de(c.get("/login"))
+    pagina = c.get("/configurar")
+    malo = c.post("/configurar", data={"codigo": "XXXX0000", "nombre": "Intruso", "usuario": "intruso",
+                                       "contrasena": "12345678", "repetida": "12345678",
+                                       "token": token_de(pagina)})
+    rechazado = "código de configuración no es correcto" in texto_de(malo)
+    cliente, texto = crear_propietario_de_prueba()
+    creado = "Administrar cuentas" in texto and "Cuenta de propietario creada" in texto
+    sin_codigo = not os.path.exists(cuentas.ruta_codigo())
+    cerrado = "ya está configurado" in texto_de(aplicacion.app.test_client().get("/configurar",
+                                                                                 follow_redirects=True))
+    return aviso and rechazado and creado and sin_codigo and cerrado
+
+
+def caso_crear_cuentas():
+    dueno, texto = crear_propietario_de_prueba()
+    pagina = dueno.get("/cuentas")
+    r = dueno.post("/cuentas", data={"accion": "crear", "nombre": "Amigo Uno", "usuario": "amigo1",
+                                     "rol": "gerente", "obra": "", "contrasena": "Amigo-Uno-1",
+                                     "repetida": "Amigo-Uno-1", "token": token_de(pagina)})
+    creada = "Cuenta creada: amigo1" in texto_de(r)
+    repetida = dueno.post("/cuentas", data={"accion": "crear", "nombre": "Otro", "usuario": "amigo1",
+                                            "rol": "gerente", "contrasena": "Amigo-Uno-1",
+                                            "repetida": "Amigo-Uno-1", "token": token_de(pagina)})
+    duplicado = "Ya existe una cuenta" in texto_de(repetida)
+    amigo, bienvenida = entrar("amigo1", "Amigo-Uno-1")
+    puede_entrar = "Bienvenido(a), Amigo Uno" in bienvenida
+    bloqueado = "Solo el propietario" in texto_de(amigo.get("/cuentas"))
+    return creada and duplicado and puede_entrar and bloqueado
+
+
+def caso_restablecer_y_desactivar():
+    dueno, texto = crear_propietario_de_prueba()
+    pagina = dueno.get("/cuentas")
+    r1 = dueno.post("/cuentas", data={"accion": "restablecer", "usuario": "jpivaral",
+                                      "contrasena": "Nueva-Bodega-9", "repetida": "Nueva-Bodega-9",
+                                      "token": token_de(pagina)})
+    julian, bienvenida = entrar("jpivaral", "Nueva-Bodega-9")
+    restablecida = "restablecida" in texto_de(r1) and "Bienvenido(a), Julián" in bienvenida
+    r2 = dueno.post("/cuentas", data={"accion": "desactivar", "usuario": "jpivaral",
+                                      "token": token_de(pagina)})
+    desactivada = "desactivada" in texto_de(r2)
+    sesion_cerrada = "Usuario Contraseña Ver Entrar" in texto_de(julian.get("/", follow_redirects=True))
+    c, intento = entrar("jpivaral", "Nueva-Bodega-9")
+    no_entra = "incorrectos" in intento
+    propia = dueno.post("/cuentas", data={"accion": "desactivar", "usuario": "dueno",
+                                          "token": token_de(pagina)})
+    no_se_bloquea = "No puede desactivar su propia cuenta" in texto_de(propia)
+    return restablecida and desactivada and sesion_cerrada and no_entra and no_se_bloquea
+
+
+def caso_mi_contrasena():
+    c, bienvenida = entrar("esantos", "maestro123")
+    pagina = c.get("/mi-contrasena")
+    mala = c.post("/mi-contrasena", data={"actual": "otra-cosa", "nueva": "Maestro-Nuevo-1",
+                                          "repetida": "Maestro-Nuevo-1", "token": token_de(pagina)})
+    buena = c.post("/mi-contrasena", data={"actual": "maestro123", "nueva": "Maestro-Nuevo-1",
+                                           "repetida": "Maestro-Nuevo-1", "token": token_de(pagina)})
+    c2, otra = entrar("esantos", "Maestro-Nuevo-1")
+    return ("no es correcta" in texto_de(mala) and "se cambió correctamente" in texto_de(buena)
+            and "Bienvenido(a), Erick Santos" in otra)
+
+
 CASOS = [
     ("W-01", "Búsqueda flexible (mayúsculas, artículos, orden, errores de escritura)", caso_busqueda_flexible),
     ("W-02", "Inicio de sesión: 3 intentos y bloqueo de 5 minutos", caso_login_y_bloqueo),
@@ -192,6 +279,10 @@ CASOS = [
     ("W-10", "App instalable: manifiesto, service worker, sin conexión, íconos", caso_app_instalable),
     ("W-11", "Versión publicada rechaza contraseñas de prueba", caso_modo_publico),
     ("W-12", "Contraseñas reales desde variables de entorno del hosting", caso_contrasenas_de_entorno),
+    ("W-13", "Configurar el primer propietario con el código del servidor", caso_configurar_propietario),
+    ("W-14", "El propietario crea cuentas; los demás no pueden", caso_crear_cuentas),
+    ("W-15", "Restablecer contraseña y desactivar una cuenta", caso_restablecer_y_desactivar),
+    ("W-16", "Cada usuario cambia su propia contraseña", caso_mi_contrasena),
 ]
 
 
@@ -201,6 +292,9 @@ if __name__ == "__main__":
     for identificador, descripcion, funcion in CASOS:
         reiniciar_datos()
         aplicacion.INTENTOS_POR_IP.clear()
+        from sich import cuentas as modulo_cuentas
+        if os.path.exists(modulo_cuentas.ruta_codigo()):
+            os.remove(modulo_cuentas.ruta_codigo())
         resultado = funcion()
         if resultado:
             aprobados = aprobados + 1

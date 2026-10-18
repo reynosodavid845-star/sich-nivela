@@ -4,6 +4,10 @@
   <h1>Iniciar sesión</h1>
   <p class="suave">Sistema de Control de Herramientas de Nivela</p>
   {% for aviso in avisos %}<p class="alerta aviso">{{ aviso }}</p>{% endfor %}
+  {% if falta_propietario %}
+    <p class="alerta aviso">Todavía no hay una cuenta de propietario.
+      <a href="{{ url_for('configurar') }}">Configúrela aquí</a> para administrar las demás cuentas.</p>
+  {% endif %}
   {% if error %}<p class="alerta error" role="alert">{{ error }}</p>{% endif %}
   {% if minutos_bloqueo > 0 %}
     <p class="alerta error" role="alert">Se agotaron los 3 intentos. Espere {{ minutos_bloqueo }}

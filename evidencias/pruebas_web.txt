@@ -11,5 +11,9 @@ W-09 Satisfactorio    Bloqueo por IP aunque se borren las cookies
 W-10 Satisfactorio    App instalable: manifiesto, service worker, sin conexión, íconos
 W-11 Satisfactorio    Versión publicada rechaza contraseñas de prueba
 W-12 Satisfactorio    Contraseñas reales desde variables de entorno del hosting
+W-13 Satisfactorio    Configurar el primer propietario con el código del servidor
+W-14 Satisfactorio    El propietario crea cuentas; los demás no pueden
+W-15 Satisfactorio    Restablecer contraseña y desactivar una cuenta
+W-16 Satisfactorio    Cada usuario cambia su propia contraseña
 
-Resultado: 12 de 12 pruebas web satisfactorias.
+Resultado: 16 de 16 pruebas web satisfactorias.

@@ -1,5 +1,5 @@
 Caso CP-08 - 2.2 Registrar devolución
-Ejecutado: 16/10/2026 23:15
+Ejecutado: 17/10/2026 19:10
 ----------------------------------------------------------------------
 ============================================================
  SICH - Sistema de Control de Herramientas
@@ -46,9 +46,9 @@ Herramientas que están en obra:
 Escriba código, nombre o apodo (ej. bailarina) o 0 para cancelar: trompo
 Herramienta encontrada: MEZ-01 - Mezcladora grande (trompo, mezcladora grande) | ASIGNADA | VN-014
 Salió a VN-014 - Villa Nueva - banqueta ingreso sur con Luis Aguilar el 16/10/2026 06:15
-Fecha y hora de devolución [Enter = 16/10/2026 23:15]: 15/10/2026 08:00
+Fecha y hora de devolución [Enter = 17/10/2026 19:10]: 15/10/2026 08:00
 La fecha de devolución no puede ser anterior a la salida (16/10/2026 06:15).
-Fecha y hora de devolución [Enter = 16/10/2026 23:15]: 16/10/2026 16:40
+Fecha y hora de devolución [Enter = 17/10/2026 19:10]: 16/10/2026 16:40
 Estado en que se recibe:  1. Bueno   2. Con daño
 Elija 1 o 2: 2
 Observaciones (ej. ruido raro, golpe; Enter para omitir): Manija quebrada
@@ -66,7 +66,7 @@ Operación exitosa: devolución registrada. MEZ-01 está en Bodega con estado 'r
 
 ¿Desea reportar el daño ahora? (S/N): S
 Describa el daño (mínimo 5 caracteres): Manija quebrada al descargar
-Fecha y hora del daño [Enter = 16/10/2026 23:15]: 16/10/2026 16:40
+Fecha y hora del daño [Enter = 17/10/2026 19:10]: 16/10/2026 16:40
 Responsable (quién reporta o tenía la herramienta): Luis Aguilar
 
 --- Resumen de la operación ---

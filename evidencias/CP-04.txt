@@ -1,5 +1,5 @@
 Caso CP-04 - 2.1 Registrar salida
-Ejecutado: 16/10/2026 23:15
+Ejecutado: 17/10/2026 19:10
 ----------------------------------------------------------------------
 ============================================================
  SICH - Sistema de Control de Herramientas
@@ -61,9 +61,9 @@ Obra de destino (código, ej. VN-014): EUC-022
 Responsable que recibe la herramienta: 
 Este campo es obligatorio. Escriba un valor.
 Responsable que recibe la herramienta: Luis Aguilar
-Fecha y hora de salida [Enter = 16/10/2026 23:15]: 32/13/2026 25:00
+Fecha y hora de salida [Enter = 17/10/2026 19:10]: 32/13/2026 25:00
 Fecha inválida. Use el formato DD/MM/AAAA HH:MM (ej. 23/06/2026 06:15).
-Fecha y hora de salida [Enter = 16/10/2026 23:15]: 16/10/2026 06:15
+Fecha y hora de salida [Enter = 17/10/2026 19:10]: 16/10/2026 06:15
 Fecha y hora esperada de devolución [Enter = 16/10/2026 17:00]: 16/10/2026 05:00
 La devolución esperada debe ser posterior a la salida.
 Fecha y hora esperada de devolución [Enter = 16/10/2026 17:00]: 16/10/2026 19:00

@@ -11,6 +11,7 @@ NOMBRES_ROL = {
     "residente": "Residente de obra",
     "gerente": "Gerente de operaciones (solo consulta)",
     "maestro": "Maestro de obra / personal de campo",
+    "propietario": "Propietario (administra las cuentas)",
 }
 
 # Opciones del menú que puede usar cada rol (según la Fase 2).
@@ -20,15 +21,19 @@ PERMISOS_POR_ROL = {
     "residente": ["2.3", "2.4", "2.6", "3.1", "3.2", "3.3", "3.4", "3.5"],
     "gerente": ["3.1", "3.2", "3.3", "3.4", "3.5"],
     "maestro": ["2.4", "3.1", "3.4"],
+    # El propietario puede usar todo y, además, administrar las cuentas (página web).
+    "propietario": ["1.1", "1.2", "1.3", "2.1", "2.2", "2.3", "2.4", "2.5", "2.6",
+                    "3.1", "3.2", "3.3", "3.4", "3.5"],
 }
 
 
 def verificar_credenciales(datos, nombre_usuario, contrasena):
-    """Devuelve el usuario si las credenciales son correctas; si no, None."""
+    """Devuelve el usuario si las credenciales son correctas y la cuenta está activa."""
     contrasena_cifrada = cifrar_contrasena(contrasena)
     for usuario in datos["usuarios"]:
         if usuario["usuario"] == nombre_usuario.strip().lower() \
-                and usuario["contrasena"] == contrasena_cifrada:
+                and usuario["contrasena"] == contrasena_cifrada \
+                and usuario.get("activo", True):
             return usuario
     return None
 

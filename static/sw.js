@@ -2,11 +2,11 @@
 // clara cuando no hay internet. Los datos (herramientas, movimientos) NUNCA se
 // guardan en el teléfono: siempre se piden al servidor para que estén al día.
 
-var VERSION = 'sich-v4';
+var VERSION = 'sich-v5';
 var ARCHIVOS_FIJOS = [
   '/sin-conexion',
-  '/static/estilos.css?v=4',
-  '/static/sich.js?v=4',
+  '/static/estilos.css?v=5',
+  '/static/sich.js?v=5',
   '/static/iconos/icono-192.png',
   '/static/iconos/icono-512.png'
 ];

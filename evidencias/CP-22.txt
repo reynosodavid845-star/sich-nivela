@@ -1,5 +1,5 @@
 Caso CP-22 - 2.6 Autorizar permanencia en obra
-Ejecutado: 16/10/2026 23:15
+Ejecutado: 17/10/2026 19:10
 ----------------------------------------------------------------------
 ============================================================
  SICH - Sistema de Control de Herramientas
@@ -50,7 +50,7 @@ Se encontraron 2 herramientas con ese nombre o apodo:
   2. NIV-LAS-02 - Nivel láser (nivel, laser) | DISPONIBLE | Bodega
 Elija el número de la herramienta (0 = buscar otra vez): 1
 Obra donde se quedará: Z11-009 - Zona 11 - reparación de drenaje
-Inicio de la permanencia [Enter = 16/10/2026 23:15]: 16/10/2026 17:00
+Inicio de la permanencia [Enter = 17/10/2026 19:10]: 16/10/2026 17:00
 Fin de la permanencia [Enter = 17/10/2026 06:15]: 17/10/2026 06:15
 ¿Confirma que el sitio tiene seguridad (garita, guardián o bodega con llave)? (S/N): S
 Observaciones (opcional, Enter para omitir): 

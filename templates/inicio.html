@@ -13,6 +13,11 @@
     <span class="nombre">Dañadas / en revisión</span><small>No pueden salir</small></div>
 </section>
 
+{% if es_propietario %}
+<a class="boton-grande propietario" href="{{ url_for('administrar_cuentas') }}">Administrar cuentas
+  <small>Crear cuentas, restablecer contraseñas y quitar accesos</small></a>
+{% endif %}
+
 {% if rapidos %}
 <h2>¿Qué necesita hacer?</h2>
 <nav class="rapidos" aria-label="Accesos rápidos">
