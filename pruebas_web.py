@@ -152,6 +152,9 @@ def caso_app_instalable():
             and "Sin conexión a internet" in texto_de(sin_red)
             and "Agregar a inicio" in texto_de(instalar)
             and 'rel="manifest"' in inicio and "apple-touch-icon" in inicio
+            and inicio.count("solo-navegador") == 2
+            and "display-mode: standalone" in c.get("/static/estilos.css").get_data(as_text=True)
+            and "solo-navegador" in c.get("/instalar").get_data(as_text=True)
             and c.get("/static/iconos/icono-512.png").status_code == 200)
 
 

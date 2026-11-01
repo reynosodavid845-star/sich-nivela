@@ -48,7 +48,7 @@ app.config["SESSION_COOKIE_SECURE"] = PUBLICO
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(hours=12)   # un turno de trabajo
 app.config["MAX_CONTENT_LENGTH"] = herramientas.MAXIMO_BYTES_FICHA + 1024 * 1024
 
-VERSION_ESTATICOS = "7"          # cambiarla obliga al navegador a bajar el CSS/JS nuevo
+VERSION_ESTATICOS = "8"          # cambiarla obliga al navegador a bajar el CSS/JS nuevo
 FORMATO_WEB = "%Y-%m-%dT%H:%M"   # formato de <input type="datetime-local">
 MAXIMO_INTENTOS_CODIGO = 3       # códigos de configuración incorrectos antes de la espera
 MINUTOS_BLOQUEO = 5              # espera después de esos códigos incorrectos

@@ -1,12 +1,13 @@
 {% extends "base.html" %}
 {% block contenido %}
 <h1>Instalar SICH en el teléfono o tablet</h1>
+<p id="ya-instalada" class="alerta exito" hidden>SICH ya está instalada en este dispositivo.</p>
+
+<div class="solo-navegador">
 <p class="suave">SICH se instala como una app: queda con su ícono en la pantalla de inicio,
   se abre a pantalla completa y no ocupa casi espacio. No hace falta tienda de aplicaciones.</p>
 
 <button id="boton-instalar-grande" class="boton-grande" type="button" hidden>Instalar SICH ahora</button>
-<p id="ya-instalada" class="alerta exito" hidden>SICH ya está instalada en este dispositivo.</p>
-
 <section class="tarjeta">
   <h2>Android (Chrome)</h2>
   <ol>
@@ -32,6 +33,7 @@
     <li>Confirme con <strong>Instalar</strong>.</li>
   </ol>
 </section>
+</div>
 
 <p class="suave">Importante: la app necesita internet para registrar movimientos, porque todos
   deben ver la misma información. Si se va la señal, SICH lo avisa.</p>

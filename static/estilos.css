@@ -166,6 +166,9 @@ footer a { color: var(--primario); display: inline-block; padding: 8px; }
 footer p { margin: 4px 0 0; }
 #boton-instalar { display: block; margin: 0 auto 8px; background: var(--primario); color: #fff; }
 #boton-instalar[hidden] { display: none; }
+/* Ya instalada: no se ofrece instalarla otra vez. */
+html.instalada .solo-navegador { display: none !important; }
+@media (display-mode: standalone) { .solo-navegador { display: none !important; } }
 
 /* Áreas táctiles de al menos 48 px y sin zoom raro al tocar campos en iPhone */
 input, select, button { min-height: 48px; font-size: max(16px, 1em); }

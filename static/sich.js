@@ -82,14 +82,43 @@ function enfocarErrores() {
 
 // ---------- App instalable (PWA) ----------
 var avisoDeInstalacion = null;   // el navegador lo entrega cuando la app se puede instalar
+var CLAVE_INSTALADA = 'sich-instalada';
 
-function yaEstaInstalada() {
+// Se abrió desde el ícono instalado.
+function abiertaComoApp() {
   return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 }
+
+// Recuerda en este dispositivo que se instaló, para no ofrecerla también en el navegador.
+function recordarInstalada(instalada) {
+  try {
+    if (instalada) { localStorage.setItem(CLAVE_INSTALADA, 'si'); } else { localStorage.removeItem(CLAVE_INSTALADA); }
+  } catch (error) { /* sin almacenamiento, solo se oculta al abrirla como app */ }
+}
+
+function recuerdaInstalada() {
+  try { return localStorage.getItem(CLAVE_INSTALADA) === 'si'; } catch (error) { return false; }
+}
+
+function yaEstaInstalada() {
+  return abiertaComoApp() || recuerdaInstalada();
+}
+
+// Oculta o vuelve a mostrar todo lo que invita a instalar.
+function marcarInstalada(instalada) {
+  document.documentElement.classList.toggle('instalada', instalada);
+  var aviso = document.getElementById('ya-instalada');
+  if (aviso) { aviso.hidden = !instalada; }
+}
+
+if (yaEstaInstalada()) { document.documentElement.classList.add('instalada'); }
 
 window.addEventListener('beforeinstallprompt', function (evento) {
   evento.preventDefault();
   avisoDeInstalacion = evento;
+  // El navegador solo lo ofrece si no está instalada; por ejemplo, si la desinstalaron.
+  recordarInstalada(false);
+  marcarInstalada(false);
   ['boton-instalar', 'boton-instalar-grande'].forEach(function (id) {
     var boton = document.getElementById(id);
     if (boton) { boton.hidden = false; }
@@ -98,12 +127,12 @@ window.addEventListener('beforeinstallprompt', function (evento) {
 
 window.addEventListener('appinstalled', function () {
   avisoDeInstalacion = null;
+  recordarInstalada(true);
+  marcarInstalada(true);
   ['boton-instalar', 'boton-instalar-grande'].forEach(function (id) {
     var boton = document.getElementById(id);
     if (boton) { boton.hidden = true; }
   });
-  var aviso = document.getElementById('ya-instalada');
-  if (aviso) { aviso.hidden = false; }
 });
 
 function prepararInstalacion() {
@@ -117,8 +146,8 @@ function prepararInstalacion() {
       avisoDeInstalacion = null;
     });
   });
-  var aviso = document.getElementById('ya-instalada');
-  if (aviso && yaEstaInstalada()) { aviso.hidden = false; }
+  if (abiertaComoApp()) { recordarInstalada(true); }
+  marcarInstalada(yaEstaInstalada());
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(function () { /* sin PWA, la web funciona igual */ });
   }
