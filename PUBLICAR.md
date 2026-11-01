@@ -90,7 +90,8 @@ Abra la dirección en el teléfono y toque **¿Cómo instalar SICH en el teléfo
 |---|---|
 | `SICH_PUBLICO=1` (lo pone `wsgi.py`) | La cookie de sesión solo viaja por HTTPS y se rechazan las contraseñas de demostración |
 | `SICH_CLAVE` | Clave secreta de las sesiones; si no se define, se crea una al azar en cada arranque |
-| 3 intentos por dirección IP | Luego hay que esperar 5 minutos, aunque se borren las cookies |
+| Inicio de sesión sin límite de intentos | Nadie queda bloqueado; por eso cada cuenta necesita una contraseña larga y difícil |
+| 3 intentos del código de configuración | Luego hay que esperar 5 minutos, aunque se borren las cookies |
 | Token en cada formulario | Evita que otra página envíe formularios en nombre del usuario |
 | PBKDF2-SHA256 con sal | `usuarios.json` guarda una huella que no se puede revertir, distinta para cada contraseña |
 | Sesión de 12 horas | Un turno de trabajo; después hay que volver a entrar |

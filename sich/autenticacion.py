@@ -3,7 +3,6 @@
 from sich.datos import cifrar_contrasena, contrasena_correcta, es_formato_antiguo, guardar_datos
 from sich.validaciones import confirmar, leer_texto_no_vacio, mostrar_titulo
 
-MAXIMO_INTENTOS = 3
 MENSAJE_SIN_PERMISO = "No tiene permisos para esta opción."
 
 NOMBRES_ROL = {
@@ -43,9 +42,8 @@ def verificar_credenciales(datos, nombre_usuario, contrasena):
 
 
 def iniciar_sesion(datos):
-    """Pide usuario y contraseña (máximo 3 intentos). Devuelve el usuario o None."""
-    intentos = 0
-    while intentos < MAXIMO_INTENTOS:
+    """Pide usuario y contraseña hasta que entre o desista. Devuelve el usuario o None."""
+    while True:
         mostrar_titulo("SICH - INICIAR SESIÓN")
         nombre_usuario = leer_texto_no_vacio("Usuario: ")
         contrasena = leer_texto_no_vacio("Contraseña: ")
@@ -53,16 +51,9 @@ def iniciar_sesion(datos):
         if usuario is not None:
             print("\nBienvenido(a),", usuario["nombre"], "-", NOMBRES_ROL[usuario["rol"]])
             return usuario
-        intentos = intentos + 1
         print("\nUsuario o contraseña incorrectos.")
-        restantes = MAXIMO_INTENTOS - intentos
-        if restantes == 0:
-            print("Se agotaron los", MAXIMO_INTENTOS, "intentos.")
-            return None
-        print("Le quedan", restantes, "intento(s).")
         if not confirmar("¿Desea intentar de nuevo?"):
             return None
-    return None
 
 
 def tiene_permiso(usuario, id_opcion):

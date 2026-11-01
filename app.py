@@ -17,7 +17,7 @@ from flask import Flask, flash, redirect, render_template, request, send_from_di
     session, url_for
 
 from sich import movimientos
-from sich.autenticacion import MAXIMO_INTENTOS, MENSAJE_SIN_PERMISO, NOMBRES_ROL, \
+from sich.autenticacion import MENSAJE_SIN_PERMISO, NOMBRES_ROL, \
     tiene_permiso, verificar_credenciales
 from sich.busqueda import buscar_con_detalle
 from sich.catalogo import descripcion_corta, nombre_obra, obras_activas, obtener_herramienta
@@ -50,10 +50,11 @@ app.config["MAX_CONTENT_LENGTH"] = herramientas.MAXIMO_BYTES_FICHA + 1024 * 1024
 
 VERSION_ESTATICOS = "7"          # cambiarla obliga al navegador a bajar el CSS/JS nuevo
 FORMATO_WEB = "%Y-%m-%dT%H:%M"   # formato de <input type="datetime-local">
-MINUTOS_BLOQUEO = 5              # espera después de 3 intentos fallidos de inicio de sesión
+MAXIMO_INTENTOS_CODIGO = 3       # códigos de configuración incorrectos antes de la espera
+MINUTOS_BLOQUEO = 5              # espera después de esos códigos incorrectos
 CARPETA_ESTATICA = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
 
-# Intentos fallidos por dirección IP: así borrar las cookies no da más intentos.
+# Códigos de configuración fallidos por dirección IP: así borrar las cookies no da más intentos.
 # Formato: {ip: [intentos, bloqueado_hasta]}
 INTENTOS_POR_IP = {}
 
@@ -504,7 +505,7 @@ def registrar_intento_fallido(ip):
     """Suma un intento fallido; al tercero bloquea la IP 5 minutos. Devuelve los intentos."""
     intentos, hasta = INTENTOS_POR_IP.get(ip, [0, 0])
     intentos = intentos + 1
-    if intentos >= MAXIMO_INTENTOS:
+    if intentos >= MAXIMO_INTENTOS_CODIGO:
         hasta = time.time() + MINUTOS_BLOQUEO * 60
     INTENTOS_POR_IP[ip] = [intentos, hasta]
     return intentos
@@ -512,37 +513,29 @@ def registrar_intento_fallido(ip):
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    """Inicio de sesión: 3 intentos por dirección IP y luego una espera de 5 minutos."""
+    """Inicio de sesión, sin límite de intentos."""
     datos, avisos = cargar_datos()
     if usuario_actual(datos) is not None:
         return redirect(url_for("inicio"))
     error = ""
     nombre_escrito = ""
-    ip = ip_del_cliente()
-    minutos = tiempo_de_bloqueo_restante(ip)
-    if request.method == "POST" and minutos == 0:
+    if request.method == "POST":
         nombre_escrito = request.form.get("usuario", "").strip()[:40]
         usuario = verificar_credenciales(datos, nombre_escrito, request.form.get("contrasena", ""))
         if usuario is not None and PUBLICO \
                 and es_contrasena_de_demostracion(request.form.get("contrasena", "")):
             error = ("Por seguridad, las contraseñas de prueba no funcionan en la versión "
                      "publicada. El administrador debe cambiarla con cambiar_contrasena.py.")
-            return render_template("login.html", error=error, minutos_bloqueo=0, avisos=avisos,
+            return render_template("login.html", error=error, avisos=avisos,
                                    nombre_escrito=nombre_escrito)
         if usuario is not None:
-            INTENTOS_POR_IP.pop(ip, None)
             session.clear()
             session.permanent = True
             session["usuario"] = usuario["usuario"]
             flash("Bienvenido(a), " + usuario["nombre"] + ".", "exito")
             return redirect(url_for("inicio"))
-        intentos = registrar_intento_fallido(ip)
-        if intentos >= MAXIMO_INTENTOS:
-            minutos = MINUTOS_BLOQUEO
-        else:
-            error = ("Usuario o contraseña incorrectos. Le quedan "
-                     + str(MAXIMO_INTENTOS - intentos) + " intento(s).")
-    return render_template("login.html", error=error, minutos_bloqueo=minutos, avisos=avisos,
+        error = "Usuario o contraseña incorrectos. Intente de nuevo."
+    return render_template("login.html", error=error, avisos=avisos,
                            nombre_escrito=nombre_escrito,
                            falta_propietario=not cuentas.hay_propietario(datos))
 

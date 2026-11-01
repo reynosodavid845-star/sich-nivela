@@ -56,15 +56,15 @@ def caso_busqueda_flexible():
     return ok
 
 
-def caso_login_y_bloqueo():
+def caso_login_sin_limite():
     c = aplicacion.app.test_client()
     t = token_de(c.get("/login"))
-    r1 = c.post("/login", data={"usuario": "jpivaral", "contrasena": "mala", "token": t})
-    c.post("/login", data={"usuario": "jpivaral", "contrasena": "mala", "token": t})
-    r3 = c.post("/login", data={"usuario": "jpivaral", "contrasena": "mala", "token": t})
-    r4 = c.post("/login", data={"usuario": "jpivaral", "contrasena": "bodega123", "token": t})
-    return ("Le quedan 2 intento(s)" in texto_de(r1) and "Se agotaron los 3 intentos" in texto_de(r3)
-            and "Espere" in texto_de(r4))
+    fallidos = [c.post("/login", data={"usuario": "jpivaral", "contrasena": "mala", "token": t})
+                for numero in range(6)]
+    bueno = c.post("/login", data={"usuario": "jpivaral", "contrasena": "bodega123", "token": t},
+                   follow_redirects=True)
+    return (all("Usuario o contraseña incorrectos" in texto_de(r) for r in fallidos)
+            and "Bienvenido(a), Julián" in texto_de(bueno))
 
 
 def caso_sin_token():
@@ -127,13 +127,15 @@ def caso_ninguna_pendiente():
     return sin_pendientes and "No tiene permisos para esta opción" in texto_de(gerente.get("/opcion/2.1"))
 
 
-def caso_bloqueo_por_ip():
-    """Borrar cookies (cliente nuevo) no da más intentos: el bloqueo es por IP."""
+def caso_codigo_bloqueado_por_ip():
+    """El código de configuración sí tiene límite: borrar cookies no da más intentos."""
     for numero in range(3):
         c = aplicacion.app.test_client()
-        c.post("/login", data={"usuario": "x", "contrasena": "y", "token": token_de(c.get("/login"))})
+        c.post("/configurar", data={"codigo": "XXXX0000", "nombre": "x", "usuario": "x",
+                                    "contrasena": "12345678", "repetida": "12345678",
+                                    "token": token_de(c.get("/configurar"))})
     nuevo = aplicacion.app.test_client()
-    return "Espere" in texto_de(nuevo.get("/login"))
+    return "Demasiados intentos" in texto_de(nuevo.get("/configurar"))
 
 
 def caso_app_instalable():
@@ -408,14 +410,14 @@ def caso_mi_contrasena():
 
 CASOS = [
     ("W-01", "Búsqueda flexible (mayúsculas, artículos, orden, errores de escritura)", caso_busqueda_flexible),
-    ("W-02", "Inicio de sesión: 3 intentos y bloqueo de 5 minutos", caso_login_y_bloqueo),
+    ("W-02", "Inicio de sesión sin límite de intentos", caso_login_sin_limite),
     ("W-03", "Formulario sin token es rechazado", caso_sin_token),
     ("W-04", "Salida completa: revisar, confirmar y guardar", caso_salida_completa),
     ("W-05", "La web aplica las mismas reglas que la consola", caso_reglas_compartidas),
     ("W-06", "Accesos rápidos según el rol", caso_accesos_rapidos_por_rol),
     ("W-07", "Sesión vencida y página inexistente", caso_paginas_de_error_y_sesion),
     ("W-08", "Ninguna opción queda pendiente y se respetan los permisos", caso_ninguna_pendiente),
-    ("W-09", "Bloqueo por IP aunque se borren las cookies", caso_bloqueo_por_ip),
+    ("W-09", "Código de configuración: límite por IP aunque se borren las cookies", caso_codigo_bloqueado_por_ip),
     ("W-10", "App instalable: manifiesto, service worker, sin conexión, íconos", caso_app_instalable),
     ("W-11", "Versión publicada rechaza contraseñas de prueba", caso_modo_publico),
     ("W-12", "Contraseñas reales desde variables de entorno del hosting", caso_contrasenas_de_entorno),

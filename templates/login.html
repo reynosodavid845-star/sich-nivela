@@ -9,11 +9,6 @@
       <a href="{{ url_for('configurar') }}">Configúrela aquí</a> para administrar las demás cuentas.</p>
   {% endif %}
   {% if error %}<p class="alerta error" role="alert">{{ error }}</p>{% endif %}
-  {% if minutos_bloqueo > 0 %}
-    <p class="alerta error" role="alert">Se agotaron los 3 intentos. Espere {{ minutos_bloqueo }}
-      minuto(s) y vuelva a intentarlo, o pida a bodega que revise su usuario.</p>
-    <a class="boton-grande secundario" href="{{ url_for('login') }}">Volver a intentar</a>
-  {% else %}
   <form method="post" class="formulario">
     <input type="hidden" name="token" value="{{ token }}">
     <label for="usuario">Usuario</label>
@@ -27,7 +22,6 @@
     </div>
     <button class="boton-grande" type="submit" data-enviando="Entrando...">Entrar</button>
   </form>
-  {% endif %}
 </section>
 <p class="centrado"><a class="boton secundario" href="{{ url_for('instalar') }}">Instalar SICH en el teléfono</a></p>
 {% endblock %}
