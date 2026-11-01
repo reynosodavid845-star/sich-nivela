@@ -83,6 +83,22 @@ def leer_texto_opcional(mensaje):
     return input(mensaje).strip()
 
 
+def leer_entero(mensaje, minimo, maximo, por_defecto=None):
+    """Pide un número entero entre minimo y maximo. Enter usa por_defecto, si lo hay."""
+    while True:
+        texto = input(mensaje).strip()
+        if texto == "" and por_defecto is not None:
+            return por_defecto
+        try:
+            numero = int(texto)
+        except ValueError:
+            print("Escriba un número entero, sin letras (ej. 400).")
+            continue
+        if minimo <= numero <= maximo:
+            return numero
+        print("Escriba un número entre", minimo, "y", str(maximo) + ".")
+
+
 def leer_fecha_hora(mensaje, valor_por_defecto):
     """Pide una fecha DD/MM/AAAA HH:MM. Enter vacío usa valor_por_defecto."""
     while True:

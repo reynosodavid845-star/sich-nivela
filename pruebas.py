@@ -1,4 +1,4 @@
-"""Pruebas automáticas de SICH (casos CP del Módulo 2 y casos CN de navegación).
+"""Pruebas automáticas de SICH (casos CP de los 3 módulos y casos CN de navegación).
 
 Cada caso ejecuta el programa de consola real (main.py) escribiendo las
 entradas automáticamente, revisa los mensajes que aparecen y el estado de
@@ -26,7 +26,12 @@ os.environ["SICH_DATOS"] = CARPETA_TEMPORAL
 import main  # noqa: E402
 from sich import datos as modulo_datos  # noqa: E402
 from sich.catalogo import obtener_herramienta  # noqa: E402
-from sich.movimientos import esta_vencida, motivo_bloqueo_salida, registrar_salida  # noqa: E402
+from sich.busqueda import buscar_herramienta  # noqa: E402
+from sich.consultas import consultar_disponibles, consultar_historial, consultar_pendientes, \
+    consultar_mantenimiento, consultar_por_obra, error_en_consulta_por_obra  # noqa: E402
+from sich.movimientos import esta_vencida, mantenimiento_vencido, motivo_bloqueo_recepcion, \
+    motivo_bloqueo_salida, \
+    registrar_salida  # noqa: E402
 
 CARPETA_EVIDENCIAS = os.path.join(os.path.dirname(os.path.abspath(__file__)), "evidencias")
 
@@ -78,6 +83,14 @@ def datos_guardados():
     """Lee todos los datos guardados."""
     datos, avisos = modulo_datos.cargar_datos()
     return datos
+
+
+def obtener_cuenta(nombre_usuario):
+    """Cuenta de usuario guardada."""
+    for usuario in datos_guardados()["usuarios"]:
+        if usuario["usuario"] == nombre_usuario:
+            return usuario
+    return None
 
 
 def estado_de(codigo):
@@ -305,6 +318,190 @@ CASOS = [
      "esperado": "Avisa que no encontró el archivo y lo crea con los datos iniciales.",
      "textos": ["no se encontró movimientos.json"],
      "verificar": lambda: os.path.exists(modulo_datos.ruta_archivo("movimientos"))},
+    # ------------------------- 1.1 Registrar herramienta
+    {"id": "CP-27", "funcionalidad": "1.1 Registrar herramienta",
+     "condiciones": "ROT-04 no existe. Usuario jpivaral (bodega).",
+     "entradas": BODEGA + ["1", "1", "rot-04", "Rotomartillo", "Perforación", "Makita", "1", "S",
+                           "Carbones cada 300 horas", "muchas", "-5", "300", "", "S"] + VOLVER_Y_SALIR,
+     "esperado": "Rechaza horas que no son un número válido y registra ROT-04 en Bodega, disponible, "
+                 "con su ficha técnica y 0 de 300 horas.",
+     "textos": ["Escriba un número entero", "Escriba un número entre",
+                "Operación exitosa: herramienta registrada. ROT-04", "Horas de uso: 0 de 300 h"],
+     "verificar": lambda: estado_de("ROT-04") == ("disponible", "Bodega")
+                          and herramienta_guardada("ROT-04")["ficha_tecnica"] == "Carbones cada 300 horas"},
+    {"id": "CP-28", "funcionalidad": "1.1 Registrar herramienta",
+     "condiciones": "COM-01 ya existe; COR-01 es apodo de PUL-03.",
+     "entradas": BODEGA + ["1", "1", "COM-01", "com01", "RO#4", "COR-01", "0"] + VOLVER_Y_SALIR,
+     "esperado": "Rechaza código duplicado (con y sin guion), caracteres inválidos y un código que "
+                 "ya es apodo; con 0 cancela.",
+     "textos": ["Ya existe una herramienta con el código COM-01", "solo puede tener letras",
+                "ya se usa como apodo de PUL-03", "Operación cancelada"],
+     "verificar": lambda: len(datos_guardados()["herramientas"]) == 14},
+    # ------------------------- 1.2 Asociar apodos
+    {"id": "CP-29", "funcionalidad": "1.2 Asociar apodos",
+     "condiciones": "ROT-01 existe; 'bailarina' ya es apodo de COM-01.",
+     "entradas": BODEGA + ["1", "2", "ROT-01", "taladro grande, bailarina", "S"] + VOLVER_Y_SALIR,
+     "esperado": "Asocia los apodos y avisa que 'bailarina' queda ambiguo. La búsqueda ya los reconoce.",
+     "textos": ["apodos asociados a ROT-01", "'bailarina' también es apodo de COM-01"],
+     "verificar": lambda: [h["codigo"] for h in buscar_herramienta(datos_guardados(), "taladro grande")]
+                          == ["ROT-01"]},
+    {"id": "CP-30", "funcionalidad": "1.2 Asociar apodos",
+     "condiciones": "COM-01 ya tiene el apodo 'rana'.",
+     "entradas": BODEGA + ["1", "2", "COM-01", "RANA", "COM-02", "x", "brincona", "N"] + VOLVER_Y_SALIR,
+     "esperado": "Rechaza apodo repetido, código oficial de otra herramienta y apodo muy corto; "
+                 "el usuario cancela y no se guarda.",
+     "textos": ["ya tiene el apodo 'RANA'", "es el código oficial de otra herramienta",
+                "debe tener entre 2 y 40", "Operación cancelada"],
+     "verificar": lambda: "brincona" not in herramienta_guardada("COM-01")["apodos"]},
+    # ------------------------- 1.3 Modificar herramienta
+    {"id": "CP-31", "funcionalidad": "1.3 Modificar herramienta",
+     "condiciones": "MEZ-02 marca Honda.",
+     "entradas": BODEGA + ["1", "3", "MEZ-02", "", "", "Kubota", "S", "", "", "", "1", "S"] + VOLVER_Y_SALIR,
+     "esperado": "Actualiza solo la marca, conserva el código y deja constancia en el historial.",
+     "textos": ["MEZ-02 actualizada", "marca: Honda -> Kubota"],
+     "verificar": lambda: herramienta_guardada("MEZ-02")["marca"] == "Kubota"
+                          and consultar_historial(datos_guardados(), "MEZ-02")["movimientos"][-1]["tipo"]
+                          == "modificacion"},
+    {"id": "CP-32", "funcionalidad": "1.3 Modificar herramienta",
+     "condiciones": "MEZ-03 disponible en Bodega.",
+     "entradas": BODEGA + ["1", "3", "MEZ-03", "", "", "", "S", "", "", "", "2", "S"] + VOLVER_Y_SALIR,
+     "esperado": "La da de baja; a partir de ahí la salida queda bloqueada.",
+     "textos": ["estado: disponible -> dada de baja"],
+     "verificar": lambda: "dada de baja" in motivo_bloqueo_salida(herramienta_guardada("MEZ-03"))},
+    {"id": "CP-33", "funcionalidad": "1.3 Modificar herramienta",
+     "condiciones": "MEZ-02 sin cambios.",
+     "entradas": BODEGA + ["1", "3", "MEZ-02", "", "", "", "S", "", "", "", "1"] + VOLVER_Y_SALIR,
+     "esperado": "Si no cambia ningún dato, lo indica y no registra nada.",
+     "textos": ["No cambió ningún dato."],
+     "verificar": lambda: len(consultar_historial(datos_guardados(), "MEZ-02")["movimientos"]) == 0},
+    {"id": "CP-34", "funcionalidad": "1.1 a 1.3 Permisos del catálogo",
+     "condiciones": "Usuario ecifuentes (residente), sin permiso sobre el catálogo.",
+     "entradas": RESIDENTE + ["1", "1"] + VOLVER_Y_SALIR,
+     "esperado": "Muestra 'No tiene permisos para esta opción'.",
+     "textos": ["No tiene permisos para esta opción."],
+     "verificar": lambda: len(datos_guardados()["herramientas"]) == 14},
+    # ------------------------- 3.2 a 3.5 Consultas
+    {"id": "CP-35", "funcionalidad": "3.2 Consultar disponibles",
+     "condiciones": "7 herramientas disponibles (MEZ-03 está bloqueada por mantenimiento); 2 de Perforación.",
+     "entradas": BODEGA + ["3", "2", "", "", "2", "Perforación", "", "2", "xyz", "", "0", "0"],
+     "esperado": "Sin criterio lista las 7; por categoría, las 2 de Perforación; 'xyz' no tiene resultados.",
+     "textos": ["Disponibles en bodega: 7", "Disponibles en bodega: 2",
+                "No hay herramientas disponibles con ese criterio."],
+     "verificar": lambda: [h["codigo"] for h in consultar_disponibles(datos_guardados(), "perforacion")]
+                          == ["ROT-01", "ROT-03"]},
+    {"id": "CP-36", "funcionalidad": "3.3 Devoluciones pendientes",
+     "condiciones": "ROT-02 vencida; NIV-LAS-01 con permanencia vigente; MEZ-01 en obra.",
+     "entradas": BODEGA + ["3", "3", "1", "", "3", "2", "", "0", "0"],
+     "esperado": "Ordena por fecha esperada, marca las vencidas y no marca como vencida la que "
+                 "tiene permanencia autorizada.",
+     "textos": ["Pendientes: 3", "** VENCIDA hace", "permanencia autorizada hasta"],
+     "verificar": lambda: [(p["herramienta"]["codigo"], p["vencida"]) for p in consultar_pendientes(
+         datos_guardados(), ahora=datetime(2026, 10, 16, 7, 0))]
+         == [("NIV-LAS-01", False), ("ROT-02", True), ("MEZ-01", False)]},
+    {"id": "CP-37", "funcionalidad": "3.4 Herramientas por obra",
+     "condiciones": "MEZ-01 en VN-014. Usuario ecifuentes.",
+     "entradas": RESIDENTE + ["3", "4", "vn-014", "", "4", "XYZ-1", "", "0", "0"],
+     "esperado": "Lista los equipos de VN-014 y rechaza una obra inexistente.",
+     "textos": ["MEZ-01", "La obra 'XYZ-1' no existe"],
+     "verificar": lambda: [e["herramienta"]["codigo"] for e in consultar_por_obra(datos_guardados(), "VN-014")]
+                          == ["MEZ-01"]},
+    {"id": "CP-38", "funcionalidad": "3.4 Herramientas por obra",
+     "condiciones": "esantos (maestro) tiene asignada la obra EUC-022.",
+     "entradas": MAESTRO + ["3", "4"] + VOLVER_Y_SALIR,
+     "esperado": "Al maestro le muestra directamente su obra, sin dejarle elegir otra.",
+     "textos": ["Su obra: EUC-022", "ROT-02"],
+     "verificar": lambda: "solo puede consultar su obra" in error_en_consulta_por_obra(
+         datos_guardados(), obtener_cuenta("esantos"), "VN-014")},
+    {"id": "CP-39", "funcionalidad": "3.5 Historial",
+     "condiciones": "COM-02 tiene salida, devolución y un daño.",
+     "entradas": BODEGA + ["3", "5", "bailarina grande"] + VOLVER_Y_SALIR,
+     "esperado": "Muestra movimientos en orden cronológico, daños y autorizaciones.",
+     "textos": ["Movimientos: 2", "Daños: 1", "Autorizaciones de permanencia: 0", "ruido raro"],
+     "verificar": lambda: [m["tipo"] for m in consultar_historial(datos_guardados(), "COM-02")["movimientos"]]
+                          == ["salida", "devolucion"]},
+    # ------------------------- 2.7 Confirmar recepción
+    {"id": "CP-40", "funcionalidad": "2.7 Confirmar recepción",
+     "condiciones": "ROT-02 asignada en EUC-022, la obra de esantos.",
+     "entradas": MAESTRO + ["2", "7", "ROT-02", "14/10/2026 07:00", "Llegó completa", "S"] + VOLVER_Y_SALIR,
+     "esperado": "Registra quién recibió y cuándo; ya no se puede confirmar dos veces.",
+     "textos": ["recepción confirmada", "por Erick Santos"],
+     "verificar": lambda: herramienta_guardada("ROT-02")["recepcion_confirmada_por"] == "Erick Santos"
+                          and "ya fue recibida" in motivo_bloqueo_recepcion(
+                              obtener_cuenta("esantos"), herramienta_guardada("ROT-02"))},
+    {"id": "CP-41", "funcionalidad": "2.7 Confirmar recepción",
+     "condiciones": "MEZ-01 está en VN-014, que no es la obra de esantos.",
+     "entradas": MAESTRO + ["2", "7", "MEZ-01"] + VOLVER_Y_SALIR,
+     "esperado": "Rechaza confirmar una herramienta de otra obra.",
+     "textos": ["Usted solo puede confirmar las de su obra (EUC-022)"],
+     "verificar": lambda: not herramienta_guardada("MEZ-01").get("recepcion_confirmada_por")},
+    # ------------------------- Recorrido de punta a punta
+    {"id": "CP-42", "funcionalidad": "Integración de los 3 módulos, de punta a punta",
+     "condiciones": "Datos iniciales. Participan bodega, maestro y residente.",
+     "entradas": BODEGA + ["1", "1", "COR-02", "Cortadora", "Corte", "Makita", "1", "S", "", "100", "", "S", "",
+                           "2", "COR-02", "la nueva", "S", "", "0",
+                           "2", "1", "la nueva", "EUC-022", "Luis Aguilar", "31/10/2026 06:15",
+                           "31/10/2026 17:00", "", "S", "", "0", "9"]
+                 + MAESTRO + ["2", "7", "COR-02", "31/10/2026 07:00", "", "S", "", "0", "9"]
+                 + RESIDENTE + ["2", "3", "COR-02", "VN-014", "Luis Aguilar", "", "S", "", "0", "9"]
+                 + BODEGA + ["2", "2", "COR-02", "31/10/2026 16:45", "1", "", "S", "", "0",
+                             "3", "5", "COR-02", "", "0", "0"],
+     "esperado": "Una herramienta recién registrada se encuentra por su apodo, sale, se recibe, se "
+                 "traslada, regresa y todo queda en su historial, conservado entre sesiones.",
+     "textos": ["herramienta registrada", "salida registrada", "recepción confirmada",
+                "traslado registrado", "devolución registrada", "Movimientos: 6"],
+     "verificar": lambda: estado_de("COR-02") == ("disponible", "Bodega")
+                          and sorted(m["tipo"] for m in consultar_historial(
+                              datos_guardados(), "COR-02")["movimientos"])
+                          == sorted(["registro", "apodos", "salida", "recepcion", "traslado", "devolucion"])},
+    # ------------------------- Horas de uso y mantenimiento
+    {"id": "CP-43", "funcionalidad": "Horas de uso según la ficha técnica",
+     "condiciones": "COM-01 tiene 0 de 400 h. Sale a las 07:00 y vuelve a las 19:00.",
+     "entradas": BODEGA + ["2", "1", "rana", "VN-014", "Luis Aguilar", "31/10/2026 07:00",
+                           "31/10/2026 19:00", "S", "Ing. Esteban Cifuentes", "", "S", "",
+                           "2", "COM-01", "31/10/2026 19:00", "1", "", "S"] + VOLVER_Y_SALIR,
+     "esperado": "Al devolverla suma las 12 horas: queda en 12 de 400 h.",
+     "textos": ["Horas de uso: 0 de 400 h", "Esta salida sumó 12 h (lleva 12 de 400 h)"],
+     "verificar": lambda: herramienta_guardada("COM-01")["horas_uso"] == 12},
+    {"id": "CP-44", "funcionalidad": "Alarma de mantenimiento en la salida",
+     "condiciones": "MEZ-03 tiene 250 de 250 h, disponible en Bodega.",
+     "entradas": BODEGA + ["2", "1", "MEZ-03"] + VOLVER_Y_SALIR,
+     "esperado": "Bloquea la salida con la alarma de mantenimiento.",
+     "textos": ["ALARMA DE MANTENIMIENTO: MEZ-03 llegó a 250 de 250 h"],
+     "verificar": lambda: estado_de("MEZ-03") == ("disponible", "Bodega")},
+    {"id": "CP-45", "funcionalidad": "La devolución dispara la alarma",
+     "condiciones": "COM-02 revisada: 388 de 400 h. Sale y vuelve 12 horas después.",
+     "entradas": BODEGA + ["2", "5", "COM-02", "1", "Julián Pivaral", "", "S", "",
+                           "1", "COM-02", "VN-014", "Luis Aguilar", "31/10/2026 07:00",
+                           "31/10/2026 19:00", "S", "Ing. Esteban Cifuentes", "", "S", "",
+                           "2", "COM-02", "31/10/2026 19:00", "1", "", "S", "",
+                           "1", "COM-02"] + VOLVER_Y_SALIR,
+     "esperado": "Al llegar exactamente a 400 h salta la alarma y ya no se puede volver a entregar.",
+     "textos": ["lleva 400 de 400 h", "no se puede volver a entregar",
+                "ALARMA DE MANTENIMIENTO: COM-02 llegó a 400 de 400 h"],
+     "verificar": lambda: mantenimiento_vencido(herramienta_guardada("COM-02"))},
+    {"id": "CP-46", "funcionalidad": "2.8 Registrar mantenimiento",
+     "condiciones": "MEZ-03 tiene 250 de 250 h, bloqueada.",
+     "entradas": BODEGA + ["2", "8", "MEZ-03", "31/10/2026 10:00", "Taller Honda", "Cambio de aceite", "S"]
+                 + VOLVER_Y_SALIR,
+     "esperado": "Pone el contador en 0, deja constancia en el historial y la herramienta puede volver a salir.",
+     "textos": ["MEZ-03 tenía 250 de 250 h y ahora tiene 0 de 250 h"],
+     "verificar": lambda: herramienta_guardada("MEZ-03")["horas_uso"] == 0
+                          and motivo_bloqueo_salida(herramienta_guardada("MEZ-03")) == ""
+                          and consultar_historial(datos_guardados(), "MEZ-03")["movimientos"][-1]["tipo"]
+                          == "mantenimiento"},
+    {"id": "CP-47", "funcionalidad": "2.8 Registrar mantenimiento",
+     "condiciones": "NIV-LAS-02 no tiene horas configuradas; MEZ-01 está en obra.",
+     "entradas": BODEGA + ["2", "8", "NIV-LAS-02", "", "8", "MEZ-01"] + VOLVER_Y_SALIR,
+     "esperado": "Rechaza una herramienta sin plan de mantenimiento y otra que está en obra.",
+     "textos": ["no tiene horas de mantenimiento configuradas", "registre primero la devolución"],
+     "verificar": lambda: True},
+    {"id": "CP-48", "funcionalidad": "3.6 Estado de mantenimiento",
+     "condiciones": "MEZ-03 vencido; MEZ-02 al 92%; COM-01 al día.",
+     "entradas": BODEGA + ["3", "6"] + VOLVER_Y_SALIR,
+     "esperado": "Ordena de la más cercana a vencer a la más lejana y marca vencidos y próximos.",
+     "textos": ["3.6 ESTADO DE MANTENIMIENTO", "** VENCIDO: NO SE PUEDE ENTREGAR **", "(próximo)"],
+     "verificar": lambda: [(m["herramienta"]["codigo"], m["situacion"]) for m in consultar_mantenimiento(
+         datos_guardados(), datetime(2026, 10, 16, 7, 0))][0] == ("MEZ-03", "vencido")},
     # ------------------------- Navegación
     {"id": "CN-01", "funcionalidad": "Navegación: todos los submenús y regreso",
      "condiciones": "Usuario jpivaral.",
@@ -321,14 +518,16 @@ CASOS = [
      "textos": ["Opción no válida, intente de nuevo."],
      "minimo_repeticiones": ("Opción no válida, intente de nuevo.", 5),
      "verificar": lambda: True},
-    {"id": "CN-03", "funcionalidad": "Navegación: opciones pendientes",
+    {"id": "CN-03", "funcionalidad": "Navegación: todas las opciones funcionan",
      "condiciones": "Usuario jpivaral.",
-     "entradas": BODEGA + ["1", "1", "", "2", "", "3", "", "0", "3", "2", "", "3", "", "4", "",
-                           "5", "", "0", "0"],
-     "esperado": "1.1, 1.2, 1.3, 3.2, 3.3, 3.4 y 3.5 muestran 'Funcionalidad pendiente de "
-                 "implementación' y regresan al submenú.",
-     "textos": ["Funcionalidad pendiente de implementación"],
-     "minimo_repeticiones": ("Funcionalidad pendiente de implementación", 7),
+     "entradas": BODEGA + ["1", "1", "0", "", "2", "0", "", "3", "0", "", "0",
+                           "3", "2", "", "", "3", "1", "", "4", "VN-014", "", "5", "0", "", "0", "0"],
+     "esperado": "1.1, 1.2, 1.3, 3.2, 3.3, 3.4 y 3.5 abren su funcionalidad y regresan al submenú; "
+                 "ninguna opción muestra un mensaje de pendiente.",
+     "textos": ["1.1 REGISTRAR HERRAMIENTA", "1.2 ASOCIAR APODOS", "1.3 MODIFICAR HERRAMIENTA",
+                "3.2 CONSULTAR DISPONIBLES", "3.3 DEVOLUCIONES PENDIENTES",
+                "3.4 HERRAMIENTAS POR OBRA", "3.5 HISTORIAL"],
+     "textos_ausentes": ["pendiente de implementación", "[pendiente]"],
      "verificar": lambda: True},
     {"id": "CN-04", "funcionalidad": "Navegación: rol sin permiso",
      "condiciones": "Usuario prodas (gerente, solo consulta).",
@@ -377,6 +576,9 @@ def ejecutar_caso(caso):
     for texto in caso["textos"]:
         if texto not in transcripcion:
             faltantes.append(texto)
+    for texto in caso.get("textos_ausentes", []):
+        if texto in transcripcion:
+            faltantes.append("No debía aparecer: " + texto)
     if "minimo_repeticiones" in caso:
         texto, minimo = caso["minimo_repeticiones"]
         if transcripcion.count(texto) < minimo:

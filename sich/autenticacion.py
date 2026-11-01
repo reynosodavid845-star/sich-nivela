@@ -1,6 +1,6 @@
 """Inicio de sesión y permisos por rol."""
 
-from sich.datos import cifrar_contrasena
+from sich.datos import cifrar_contrasena, contrasena_correcta, es_formato_antiguo, guardar_datos
 from sich.validaciones import confirmar, leer_texto_no_vacio, mostrar_titulo
 
 MAXIMO_INTENTOS = 3
@@ -16,24 +16,28 @@ NOMBRES_ROL = {
 
 # Opciones del menú que puede usar cada rol (según la Fase 2).
 PERMISOS_POR_ROL = {
-    "bodega": ["1.1", "1.2", "1.3", "2.1", "2.2", "2.4", "2.5",
-               "3.1", "3.2", "3.3", "3.4", "3.5"],
-    "residente": ["2.3", "2.4", "2.6", "3.1", "3.2", "3.3", "3.4", "3.5"],
-    "gerente": ["3.1", "3.2", "3.3", "3.4", "3.5"],
-    "maestro": ["2.4", "3.1", "3.4"],
+    "bodega": ["1.1", "1.2", "1.3", "2.1", "2.2", "2.4", "2.5", "2.8",
+               "3.1", "3.2", "3.3", "3.4", "3.5", "3.6"],
+    "residente": ["2.3", "2.4", "2.6", "2.7", "3.1", "3.2", "3.3", "3.4", "3.5", "3.6"],
+    "gerente": ["3.1", "3.2", "3.3", "3.4", "3.5", "3.6"],
+    "maestro": ["2.4", "2.7", "3.1", "3.4"],
     # El propietario puede usar todo y, además, administrar las cuentas (página web).
-    "propietario": ["1.1", "1.2", "1.3", "2.1", "2.2", "2.3", "2.4", "2.5", "2.6",
-                    "3.1", "3.2", "3.3", "3.4", "3.5"],
+    "propietario": ["1.1", "1.2", "1.3", "2.1", "2.2", "2.3", "2.4", "2.5", "2.6", "2.7", "2.8",
+                    "3.1", "3.2", "3.3", "3.4", "3.5", "3.6"],
 }
 
 
 def verificar_credenciales(datos, nombre_usuario, contrasena):
-    """Devuelve el usuario si las credenciales son correctas y la cuenta está activa."""
-    contrasena_cifrada = cifrar_contrasena(contrasena)
+    """Devuelve el usuario si las credenciales son correctas y la cuenta está activa.
+
+    Si la contraseña estaba guardada con el formato antiguo, la actualiza al nuevo.
+    """
     for usuario in datos["usuarios"]:
-        if usuario["usuario"] == nombre_usuario.strip().lower() \
-                and usuario["contrasena"] == contrasena_cifrada \
-                and usuario.get("activo", True):
+        if usuario["usuario"] == nombre_usuario.strip().lower() and usuario.get("activo", True) \
+                and contrasena_correcta(contrasena, usuario["contrasena"]):
+            if es_formato_antiguo(usuario["contrasena"]):
+                usuario["contrasena"] = cifrar_contrasena(contrasena)
+                guardar_datos(datos)
             return usuario
     return None
 

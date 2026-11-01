@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block contenido %}
+<h1>{{ titulo }}</h1>
+<form method="get" class="tarjeta formulario">
+  <label for="codigo">Herramienta</label>
+  <input type="search" class="filtro" data-filtra="codigo" autocomplete="off"
+         placeholder="Filtrar: escriba nombre o apodo" aria-label="Filtrar la lista de herramientas">
+  <select id="codigo" name="codigo" required>
+    {% for valor, texto_opcion in opciones %}<option value="{{ valor }}" {% if valor == codigo %}selected{% endif %}>{{ texto_opcion }}</option>{% endfor %}
+  </select>
+  <button class="boton-grande" type="submit">Ver historial</button>
+</form>
+{% if codigo and not historial %}
+  <p class="alerta error" role="alert">La herramienta '{{ codigo }}' no existe en el catálogo.</p>
+{% endif %}
+{% if historial %}
+  <section class="tarjeta">
+    <h2>{{ historial.herramienta.codigo }} · {{ historial.herramienta.nombre }}</h2>
+    <h3>Movimientos ({{ historial.movimientos|length }})</h3>
+    {% if historial.movimientos %}
+    <ol class="linea-tiempo">
+      {% for m in historial.movimientos %}
+      <li>
+        <strong>{{ nombres.get(m.tipo, m.tipo) }}</strong>
+        <span class="suave">{{ m.fecha_hora|fecha }}</span><br>
+        {% if m.obra_origen != m.obra_destino %}{{ m.obra_origen }} → {{ m.obra_destino }}{% else %}{{ m.obra_origen }}{% endif %}
+        · {{ m.responsable }}<br>
+        {% if m.observaciones %}<span>{{ m.observaciones }}</span><br>{% endif %}
+        <small class="suave">Registró {{ m.registrado_por }} el {{ m.fecha_registro|fecha }}</small>
+      </li>
+      {% endfor %}
+    </ol>
+    {% else %}<p class="suave">Sin movimientos.</p>{% endif %}
+    <h3>Daños ({{ historial.danos|length }})</h3>
+    {% if historial.danos %}<ul>{% for d in historial.danos %}<li>{{ d.fecha|fecha }}: {{ d.descripcion }} ({{ d.responsable }})</li>{% endfor %}</ul>
+    {% else %}<p class="suave">Sin daños reportados.</p>{% endif %}
+    <h3>Autorizaciones de permanencia ({{ historial.autorizaciones|length }})</h3>
+    {% if historial.autorizaciones %}<ul>{% for a in historial.autorizaciones %}<li>{{ a.obra }}: del {{ a.fecha_inicio|fecha }} al {{ a.fecha_fin|fecha }}, por {{ a.residente }}</li>{% endfor %}</ul>
+    {% else %}<p class="suave">Sin autorizaciones.</p>{% endif %}
+  </section>
+{% endif %}
+<a class="boton-grande secundario" href="{{ url_for('submenu', numero='3') }}">Regresar</a>
+{% endblock %}

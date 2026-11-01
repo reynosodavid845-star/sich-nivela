@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block contenido %}
+<h1>{{ titulo }}</h1>
+{% if lista %}
+  <p class="suave" role="status">{{ lista|length }} herramienta(s) con plan de mantenimiento, de la más cercana a vencer a la más lejana</p>
+  <div class="resultados">
+  {% for m in lista %}
+    <article class="tarjeta">
+      <h2>{{ m.herramienta.codigo }} · {{ m.herramienta.nombre }}
+        {% if m.situacion == 'vencido' %}<span class="etiqueta estado-vencida">VENCIDO: NO SE PUEDE ENTREGAR</span>
+        {% elif m.situacion == 'próximo' %}<span class="etiqueta estado-danada">PRÓXIMO</span>
+        {% else %}<span class="etiqueta estado-disponible">AL DÍA</span>{% endif %}
+      </h2>
+      <p class="uso-texto">{{ m.uso }} ({{ m.porcentaje }}%)</p>
+      <div class="barra-uso barra-{{ 'vencido' if m.situacion == 'vencido' else ('proximo' if m.situacion == 'próximo' else 'al-dia') }}" aria-hidden="true">
+        <span style="width: {{ m.porcentaje if m.porcentaje < 100 else 100 }}%"></span>
+      </div>
+      <dl>
+        <dt>Está en</dt><dd>{{ m.herramienta.ubicacion }}</dd>
+        {% if m.herramienta.ultimo_mantenimiento %}<dt>Último mantenimiento</dt><dd>{{ m.herramienta.ultimo_mantenimiento|fecha }}</dd>{% endif %}
+      </dl>
+      <div class="acciones">
+        <a class="boton secundario" href="{{ url_for('ficha', codigo=m.herramienta.codigo) }}">Ficha técnica</a>
+        {% if puede_registrar and m.herramienta.ubicacion == 'Bodega' %}
+          <a class="boton" href="{{ url_for('opcion', id_opcion='2.8', codigo=m.herramienta.codigo) }}">Registrar mantenimiento</a>
+        {% endif %}
+      </div>
+    </article>
+  {% endfor %}
+  </div>
+{% else %}
+  <p class="alerta aviso" role="status">No hay herramientas con horas de mantenimiento configuradas. Agréguelas en 1.3 Modificar herramienta.</p>
+{% endif %}
+<a class="boton-grande secundario" href="{{ url_for('submenu', numero='3') }}">Regresar</a>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block contenido %}
+<h1>{{ titulo }}</h1>
+<form method="get" class="tarjeta formulario">
+  <label for="ver">Ver</label>
+  <select id="ver" name="ver">
+    <option value="todas" {% if ver != 'vencidas' %}selected{% endif %}>Todas las pendientes</option>
+    <option value="vencidas" {% if ver == 'vencidas' %}selected{% endif %}>Solo las vencidas</option>
+  </select>
+  <label for="hasta">Esperadas hasta (opcional)</label>
+  <input id="hasta" name="hasta" type="datetime-local" value="{{ texto_hasta }}">
+  <button class="boton-grande" type="submit">Consultar</button>
+</form>
+{% if error %}<p class="alerta error" role="alert">{{ error }}</p>{% endif %}
+{% if lista %}
+  <p class="suave" role="status">{{ lista|length }} pendiente(s), de la más antigua a la más nueva</p>
+  <div class="resultados">
+  {% for p in lista %}
+    <article class="tarjeta">
+      <h2>{{ p.herramienta.codigo }} · {{ p.herramienta.nombre }}
+        {% if p.vencida %}<span class="etiqueta estado-vencida">VENCIDA hace {{ p.atraso }}</span>
+        {% elif p.autorizacion %}<span class="etiqueta estado-asignada">PERMANENCIA AUTORIZADA</span>
+        {% else %}<span class="etiqueta estado-asignada">A TIEMPO</span>{% endif %}
+      </h2>
+      <dl>
+        <dt>Se esperaba</dt><dd>{{ p.esperada.strftime('%d/%m/%Y %H:%M') }}</dd>
+        <dt>Está en</dt><dd>{{ p.herramienta.ubicacion }}</dd>
+        <dt>Responsable</dt><dd>{{ p.herramienta.responsable or '-' }}</dd>
+        {% if p.autorizacion %}<dt>Autorizada hasta</dt><dd>{{ p.autorizacion.fecha_fin|fecha }} por {{ p.autorizacion.residente }}</dd>{% endif %}
+      </dl>
+      <a class="boton" href="{{ url_for('opcion', id_opcion='2.2', codigo=p.herramienta.codigo) }}">Registrar devolución</a>
+    </article>
+  {% endfor %}
+  </div>
+{% elif not error %}
+  <p class="alerta exito" role="status">No hay devoluciones pendientes con ese criterio.</p>
+{% endif %}
+<a class="boton-grande secundario" href="{{ url_for('submenu', numero='3') }}">Regresar</a>
+{% endblock %}

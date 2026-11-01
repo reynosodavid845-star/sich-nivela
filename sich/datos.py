@@ -8,6 +8,7 @@ y se avisa al usuario.
 import hashlib
 import json
 import os
+import secrets
 
 CARPETA_PROYECTO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -19,12 +20,63 @@ COLECCIONES = ["herramientas", "obras", "usuarios", "movimientos", "danos", "aut
 
 FORMATO_FECHA = "%Y-%m-%d %H:%M"   # formato en que se guardan las fechas en JSON
 
-ORIGEN_PRUEBA = "Dato de prueba precargado (el Módulo 1 - Catálogo está pendiente)"
+ORIGEN_PRUEBA = "Dato de demostración precargado"
+
+ITERACIONES_CONTRASENA = 600000   # hace muy lento probar contraseñas robadas por fuerza bruta
+
+# Contraseñas de demostración (están en el README). La versión publicada no las acepta.
+CONTRASENAS_DEMOSTRACION = {
+    "jpivaral": "bodega123",
+    "ecifuentes": "residente123",
+    "prodas": "gerente123",
+    "esantos": "maestro123",
+}
+
+_cifradas_demostracion = {}   # se calculan una sola vez porque cifrar es lento a propósito
+
+
+def calcular_huella(contrasena, sal, iteraciones):
+    """Calcula la huella PBKDF2-SHA256 de una contraseña con su sal."""
+    return hashlib.pbkdf2_hmac("sha256", contrasena.encode("utf-8"), bytes.fromhex(sal),
+                               iteraciones).hex()
 
 
 def cifrar_contrasena(contrasena):
-    """Devuelve el hash SHA-256 de una contraseña (no se guarda en texto plano)."""
-    return hashlib.sha256(contrasena.encode("utf-8")).hexdigest()
+    """Devuelve 'pbkdf2_sha256$iteraciones$sal$huella'. Cada contraseña lleva su propia sal
+    al azar, así dos personas con la misma contraseña tienen huellas distintas."""
+    sal = secrets.token_hex(16)
+    huella = calcular_huella(contrasena, sal, ITERACIONES_CONTRASENA)
+    return "pbkdf2_sha256$" + str(ITERACIONES_CONTRASENA) + "$" + sal + "$" + huella
+
+
+def es_formato_antiguo(guardada):
+    """True si la contraseña guardada usa el SHA-256 simple de versiones anteriores."""
+    return not guardada.startswith("pbkdf2_sha256$")
+
+
+def contrasena_correcta(contrasena, guardada):
+    """Compara una contraseña escrita con la guardada (acepta también el formato antiguo)."""
+    if es_formato_antiguo(guardada):
+        calculada = hashlib.sha256(contrasena.encode("utf-8")).hexdigest()
+        return secrets.compare_digest(calculada, guardada)
+    partes = guardada.split("$")
+    if len(partes) != 4:
+        return False
+    calculada = calcular_huella(contrasena, partes[2], int(partes[1]))
+    return secrets.compare_digest(calculada, partes[3])
+
+
+def es_contrasena_de_demostracion(contrasena):
+    """True si es una de las contraseñas de demostración publicadas en el README."""
+    return contrasena in CONTRASENAS_DEMOSTRACION.values()
+
+
+def cifrada_de_demostracion(nombre_usuario):
+    """Contraseña de demostración cifrada de un usuario."""
+    if nombre_usuario not in _cifradas_demostracion:
+        _cifradas_demostracion[nombre_usuario] = cifrar_contrasena(
+            CONTRASENAS_DEMOSTRACION[nombre_usuario])
+    return _cifradas_demostracion[nombre_usuario]
 
 
 def crear_herramienta(codigo, nombre, categoria, marca, estado, apodos, motor_o_cable,
@@ -92,6 +144,21 @@ def herramientas_iniciales():
     ]
 
 
+# Plan de demostración: código -> (ficha técnica, horas entre mantenimientos, horas ya usadas).
+PLANES_DEMOSTRACION = {
+    "COM-01": ("Ficha de demostración: cambio de aceite y filtro cada 400 horas.", 400, 0),
+    "COM-02": ("Ficha de demostración: cambio de aceite y filtro cada 400 horas.", 400, 388),
+    "ROT-01": ("Ficha de demostración: carbones y lubricación cada 300 horas.", 300, 120),
+    "ROT-02": ("Ficha de demostración: carbones y lubricación cada 300 horas.", 300, 120),
+    "ROT-03": ("Ficha de demostración: carbones y lubricación cada 300 horas.", 300, 10),
+    "MEZ-01": ("Ficha de demostración: motor y transmisión cada 500 horas.", 500, 0),
+    "MEZ-02": ("Ficha de demostración: motor y transmisión cada 250 horas.", 250, 230),
+    "MEZ-03": ("Ficha de demostración: motor y transmisión cada 250 horas.", 250, 250),
+    "VIB-01": ("Ficha de demostración: revisar eje y cable cada 200 horas.", 200, 60),
+    "PUL-03": ("Ficha de demostración: escobillas y disco cada 300 horas.", 300, 40),
+}
+
+
 def obras_iniciales():
     """Obras de prueba del expediente. 'Bodega' es la ubicación de inicio."""
     return [
@@ -109,16 +176,16 @@ def obras_iniciales():
 
 
 def usuarios_iniciales():
-    """Usuarios de prueba. Las contraseñas de prueba están en el README."""
+    """Usuarios de demostración. Las contraseñas están en el README."""
     return [
         {"usuario": "jpivaral", "nombre": "Julián Pivaral", "rol": "bodega",
-         "contrasena": cifrar_contrasena("bodega123"), "obra": ""},
+         "contrasena": cifrada_de_demostracion("jpivaral"), "obra": ""},
         {"usuario": "ecifuentes", "nombre": "Ing. Esteban Cifuentes", "rol": "residente",
-         "contrasena": cifrar_contrasena("residente123"), "obra": ""},
+         "contrasena": cifrada_de_demostracion("ecifuentes"), "obra": ""},
         {"usuario": "prodas", "nombre": "Ing. Pamela Rodas", "rol": "gerente",
-         "contrasena": cifrar_contrasena("gerente123"), "obra": ""},
+         "contrasena": cifrada_de_demostracion("prodas"), "obra": ""},
         {"usuario": "esantos", "nombre": "Erick Santos", "rol": "maestro",
-         "contrasena": cifrar_contrasena("maestro123"), "obra": "EUC-022"},
+         "contrasena": cifrada_de_demostracion("esantos"), "obra": "EUC-022"},
     ]
 
 
@@ -175,10 +242,23 @@ def autorizaciones_iniciales():
     ]
 
 
+def herramientas_con_plan():
+    """Catálogo de demostración con su ficha técnica y sus horas de uso."""
+    herramientas = herramientas_iniciales()
+    for herramienta in herramientas:
+        ficha, intervalo, horas = PLANES_DEMOSTRACION.get(herramienta["codigo"], ("", 0, 0))
+        herramienta["ficha_tecnica"] = ficha
+        herramienta["ficha_archivo"] = ""
+        herramienta["mantenimiento_cada_horas"] = intervalo
+        herramienta["horas_uso"] = horas
+        herramienta["ultimo_mantenimiento"] = ""
+    return herramientas
+
+
 def datos_iniciales():
     """Devuelve un diccionario nuevo con todas las colecciones de prueba."""
     return {
-        "herramientas": herramientas_iniciales(),
+        "herramientas": herramientas_con_plan(),
         "obras": obras_iniciales(),
         "usuarios": usuarios_iniciales(),
         "movimientos": movimientos_iniciales(),
@@ -195,8 +275,10 @@ def ruta_archivo(coleccion):
 def guardar_coleccion(coleccion, registros):
     """Escribe una colección en su archivo JSON."""
     os.makedirs(CARPETA_DATOS, exist_ok=True)
-    with open(ruta_archivo(coleccion), "w", encoding="utf-8") as archivo:
+    temporal = ruta_archivo(coleccion) + ".tmp"
+    with open(temporal, "w", encoding="utf-8") as archivo:
         json.dump(registros, archivo, ensure_ascii=False, indent=2)
+    os.replace(temporal, ruta_archivo(coleccion))   # un corte a medias no daña el archivo
 
 
 def cargar_datos():
@@ -207,7 +289,6 @@ def cargar_datos():
     """
     datos = {}
     avisos = []
-    iniciales = datos_iniciales()
     for coleccion in COLECCIONES:
         try:
             with open(ruta_archivo(coleccion), "r", encoding="utf-8") as archivo:
@@ -216,12 +297,12 @@ def cargar_datos():
                 raise ValueError("el archivo no contiene una lista")
             datos[coleccion] = registros
         except FileNotFoundError:
-            datos[coleccion] = iniciales[coleccion]
+            datos[coleccion] = datos_iniciales()[coleccion]
             guardar_coleccion(coleccion, datos[coleccion])
             avisos.append("Aviso: no se encontró " + coleccion + ".json; "
                           "se creó con los datos iniciales de prueba.")
         except (json.JSONDecodeError, ValueError, UnicodeDecodeError):
-            datos[coleccion] = iniciales[coleccion]
+            datos[coleccion] = datos_iniciales()[coleccion]
             guardar_coleccion(coleccion, datos[coleccion])
             avisos.append("Aviso: el archivo " + coleccion + ".json estaba dañado; "
                           "se recreó con los datos iniciales de prueba.")

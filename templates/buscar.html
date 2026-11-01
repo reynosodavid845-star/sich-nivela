@@ -33,13 +33,12 @@
     <dl>
       {% for etiqueta, valor in r.detalle %}<dt>{{ etiqueta }}</dt><dd>{{ valor }}</dd>{% endfor %}
     </dl>
-    {% if r.acciones %}
     <div class="acciones">
+      <a class="boton secundario" href="{{ url_for('ficha', codigo=r.herramienta.codigo) }}">Ficha técnica</a>
       {% for id_opcion, texto_accion in r.acciones %}
         <a class="boton" href="{{ url_for('opcion', id_opcion=id_opcion, codigo=r.herramienta.codigo) }}">{{ texto_accion }}</a>
       {% endfor %}
     </div>
-    {% endif %}
   </article>
   {% endfor %}
   </div>

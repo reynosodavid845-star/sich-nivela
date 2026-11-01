@@ -6,6 +6,10 @@
   {% if ofrecer_dano %}
     <a class="boton-grande" href="{{ url_for('opcion', id_opcion='2.4', codigo=codigo) }}">Reportar el daño ahora</a>
   {% endif %}
+  {% if exito and id_opcion == '1.1' %}
+    <a class="boton-grande" href="{{ url_for('ficha', codigo=codigo) }}">Subir ficha técnica (PDF o foto)</a>
+    <a class="boton-grande" href="{{ url_for('opcion', id_opcion='1.2', codigo=codigo) }}">Asociar apodos a {{ codigo }}</a>
+  {% endif %}
   {% if exito and codigo %}
     <a class="boton-grande secundario" href="{{ url_for('buscar', q=codigo) }}">Ver cómo quedó {{ codigo }}</a>
   {% endif %}

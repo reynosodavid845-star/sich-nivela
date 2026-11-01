@@ -87,6 +87,39 @@ def esta_vencida(datos, herramienta, ahora=None):
     return vigente is None
 
 
+def intervalo_mantenimiento(herramienta):
+    """Horas entre mantenimientos según la ficha técnica (0 = no tiene plan)."""
+    return herramienta.get("mantenimiento_cada_horas", 0)
+
+
+def horas_de_uso(herramienta, ahora=None):
+    """Horas acumuladas desde el último mantenimiento, contando la salida en curso."""
+    horas = herramienta.get("horas_uso", 0)
+    if herramienta["ubicacion"] != "Bodega" and herramienta["fecha_salida"] != "":
+        transcurrido = momento_actual(ahora) - texto_a_fecha(herramienta["fecha_salida"])
+        horas = horas + max(transcurrido.total_seconds() / 3600, 0)
+    return round(horas, 1)
+
+
+def texto_horas(horas):
+    """Convierte 12.0 en '12' y 12.5 en '12.5'."""
+    return format(round(horas, 1), ".10g")
+
+
+def texto_de_uso(herramienta, ahora=None):
+    """Texto como '12 de 400 h'. Vacío si la herramienta no tiene plan."""
+    intervalo = intervalo_mantenimiento(herramienta)
+    if intervalo == 0:
+        return ""
+    return texto_horas(horas_de_uso(herramienta, ahora)) + " de " + str(intervalo) + " h"
+
+
+def mantenimiento_vencido(herramienta, ahora=None):
+    """True si la herramienta ya llegó a las horas que indica su ficha técnica."""
+    intervalo = intervalo_mantenimiento(herramienta)
+    return intervalo > 0 and horas_de_uso(herramienta, ahora) >= intervalo
+
+
 def fuera_de_horario(fecha):
     """True si la hora queda fuera del horario de devolución 16:30 - 17:15."""
     hora = (fecha.hour, fecha.minute)
@@ -119,6 +152,10 @@ def motivo_bloqueo_salida(herramienta):
                 "la declare apta.")
     if estado == "dada de baja":
         return codigo + " está dada de baja y no se debe usar."
+    if mantenimiento_vencido(herramienta):
+        return ("ALARMA DE MANTENIMIENTO: " + codigo + " llegó a " + texto_de_uso(herramienta)
+                + ". No se puede entregar: mándela a mantenimiento y regístrelo en "
+                  "2.8 Registrar mantenimiento.")
     return ""
 
 
@@ -170,6 +207,12 @@ def requiere_revision_por_observacion(herramienta, observaciones):
         if palabra in texto:
             return True
     return False
+
+
+def olvidar_recepcion(herramienta):
+    """Borra la confirmación de recepción: la herramienta cambió de manos."""
+    herramienta["recepcion_confirmada_por"] = ""
+    herramienta["recepcion_fecha"] = ""
 
 
 def mostrar_lista(titulo, herramientas):
@@ -246,13 +289,29 @@ def registrar_salida(datos, usuario, codigo, codigo_obra, responsable, fecha_sal
     herramienta["responsable"] = responsable.strip()
     herramienta["fecha_salida"] = fecha_a_texto(fecha_salida)
     herramienta["devolucion_esperada"] = fecha_a_texto(devolucion_esperada)
+    olvidar_recepcion(herramienta)
     agregar_movimiento(datos, "salida", herramienta, "Bodega", obra["codigo"],
                        responsable.strip(), usuario, fecha_salida, notas, ahora,
                        fecha_a_texto(devolucion_esperada))
     return True, ("Operación exitosa: salida registrada. " + herramienta["codigo"]
                   + " quedó ASIGNADA en " + nombre_obra(datos, obra["codigo"])
                   + ", responsable " + responsable.strip() + ", devolución esperada "
-                  + devolucion_esperada.strftime("%d/%m/%Y %H:%M") + ".")
+                  + devolucion_esperada.strftime("%d/%m/%Y %H:%M") + "."
+                  + aviso_de_horas_en_salida(herramienta, fecha_salida, devolucion_esperada))
+
+
+def aviso_de_horas_en_salida(herramienta, fecha_salida, devolucion_esperada):
+    """Avisa si con esta salida la herramienta llegaría a su mantenimiento."""
+    intervalo = intervalo_mantenimiento(herramienta)
+    if intervalo == 0:
+        return ""
+    previstas = (devolucion_esperada - fecha_salida).total_seconds() / 3600
+    usadas = herramienta.get("horas_uso", 0)
+    if usadas + previstas >= intervalo:
+        return (" Aviso: lleva " + texto_horas(usadas) + " de " + str(intervalo)
+                + " h y esta salida prevé " + texto_horas(previstas)
+                + " h: llegará a su mantenimiento.")
+    return ""
 
 
 def pedir_obra_destino(datos):
@@ -302,6 +361,8 @@ def proceso_registrar_salida(datos, usuario):
     if motivo != "":
         print("No se puede registrar la salida: " + motivo)
         return
+    if intervalo_mantenimiento(herramienta) > 0:
+        print("Horas de uso:", texto_de_uso(herramienta))
     codigo_obra = pedir_obra_destino(datos)
     responsable = leer_texto_no_vacio("Responsable que recibe la herramienta: ")
     fecha_salida = leer_fecha_hora("Fecha y hora de salida", momento_actual(None))
@@ -386,18 +447,26 @@ def registrar_devolucion(datos, usuario, codigo, fecha_devolucion, estado_recibi
     tarde = llego_tarde(datos, herramienta, fecha_devolucion)
     esperada = fecha_para_mostrar(herramienta["devolucion_esperada"])
     nuevo_estado = estado_despues_de_devolucion(herramienta, estado_recibido, observaciones)
+    horas_de_esta_salida = 0
+    if herramienta["fecha_salida"] != "":
+        transcurrido = fecha_devolucion - texto_a_fecha(herramienta["fecha_salida"])
+        horas_de_esta_salida = round(transcurrido.total_seconds() / 3600, 1)
+    horas_totales = round(herramienta.get("horas_uso", 0) + horas_de_esta_salida, 1)
     notas = "Estado recibido: " + estado_recibido + "."
     if observaciones.strip() != "":
         notas = notas + " " + observaciones.strip()
+    notas = notas + " Uso: " + texto_horas(horas_de_esta_salida) + " h."
     if tarde:
         notas = notas + " Devolución tardía (se esperaba " + esperada + ")."
     agregar_movimiento(datos, "devolucion", herramienta, obra_origen, "Bodega",
                        herramienta["responsable"], usuario, fecha_devolucion, notas, ahora)
     herramienta["estado"] = nuevo_estado
+    herramienta["horas_uso"] = horas_totales
     herramienta["ubicacion"] = "Bodega"
     herramienta["responsable"] = ""
     herramienta["fecha_salida"] = ""
     herramienta["devolucion_esperada"] = ""
+    olvidar_recepcion(herramienta)
     mensaje = ("Operación exitosa: devolución registrada. " + herramienta["codigo"]
                + " está en Bodega con estado '" + nuevo_estado + "'.")
     if tarde:
@@ -406,6 +475,13 @@ def registrar_devolucion(datos, usuario, codigo, fecha_devolucion, estado_recibi
         mensaje = mensaje + " La devolución llegó a tiempo."
     if nuevo_estado == "requiere revisión":
         mensaje = mensaje + " Debe registrar una revisión antes de volver a sacarla."
+    mensaje = mensaje + " Esta salida sumó " + texto_horas(horas_de_esta_salida) + " h"
+    if intervalo_mantenimiento(herramienta) > 0:
+        mensaje = mensaje + " (lleva " + texto_de_uso(herramienta) + ")"
+    mensaje = mensaje + "."
+    if mantenimiento_vencido(herramienta):
+        mensaje = (mensaje + " ALARMA DE MANTENIMIENTO: no se puede volver a entregar hasta "
+                             "registrar el mantenimiento.")
     return True, mensaje
 
 
@@ -510,6 +586,7 @@ def registrar_traslado(datos, usuario, codigo, codigo_destino, responsable, obse
                        ahora, herramienta["devolucion_esperada"])
     herramienta["ubicacion"] = destino
     herramienta["responsable"] = responsable.strip()
+    olvidar_recepcion(herramienta)
     return True, ("Operación exitosa: traslado registrado. " + herramienta["codigo"]
                   + " pasó de " + origen + " a " + nombre_obra(datos, destino)
                   + ". Responsable: " + responsable.strip()
@@ -854,6 +931,204 @@ def proceso_autorizar_permanencia(datos, usuario):
         return
     exito, mensaje = registrar_permanencia(datos, usuario, herramienta["codigo"], codigo_obra,
                                            inicio, fin, True, observaciones)
+    print("\n" + mensaje)
+    if exito:
+        guardar_datos(datos)
+
+
+# =====================================================================
+# 2.7 Confirmar recepción en obra
+# =====================================================================
+
+def herramientas_por_recibir(datos, usuario):
+    """Herramientas asignadas sin confirmar. El maestro solo ve las de su obra."""
+    lista = []
+    for herramienta in herramientas_en_obra(datos):
+        if herramienta["estado"] == "asignada" and not herramienta.get("recepcion_confirmada_por"):
+            if usuario["rol"] != "maestro" or herramienta["ubicacion"] == usuario.get("obra"):
+                lista.append(herramienta)
+    return lista
+
+
+def motivo_bloqueo_recepcion(usuario, herramienta):
+    """Explica por qué no se puede confirmar. Texto vacío = sí se puede."""
+    codigo = herramienta["codigo"]
+    if herramienta["estado"] != "asignada" or herramienta["ubicacion"] == "Bodega":
+        return codigo + " no está asignada a ninguna obra: no hay nada que recibir."
+    if usuario["rol"] == "maestro" and herramienta["ubicacion"] != usuario.get("obra"):
+        return (codigo + " está en la obra " + herramienta["ubicacion"]
+                + ". Usted solo puede confirmar las de su obra ("
+                + (usuario.get("obra") or "sin obra asignada") + ").")
+    if herramienta.get("recepcion_confirmada_por"):
+        return (codigo + " ya fue recibida por " + herramienta["recepcion_confirmada_por"]
+                + " el " + fecha_para_mostrar(herramienta["recepcion_fecha"]) + ".")
+    return ""
+
+
+def validar_recepcion(datos, usuario, codigo, fecha):
+    """Revisa las reglas de la confirmación de recepción. Devuelve la lista de errores."""
+    if not tiene_permiso(usuario, "2.7"):
+        return [MENSAJE_SIN_PERMISO]
+    errores = []
+    herramienta = herramienta_o_error(datos, codigo, errores)
+    if herramienta is None:
+        return errores
+    motivo = motivo_bloqueo_recepcion(usuario, herramienta)
+    if motivo != "":
+        return [motivo]
+    if fecha is None:
+        errores.append("Fecha inválida. Use el formato DD/MM/AAAA HH:MM.")
+    elif herramienta["fecha_salida"] != "" and fecha < texto_a_fecha(herramienta["fecha_salida"]):
+        errores.append("La recepción no puede ser anterior a la salida ("
+                       + fecha_para_mostrar(herramienta["fecha_salida"]) + ").")
+    return errores
+
+
+def registrar_recepcion(datos, usuario, codigo, fecha, observaciones="", ahora=None):
+    """Deja constancia de quién recibió la herramienta en obra. Devuelve (exito, mensaje)."""
+    errores = validar_recepcion(datos, usuario, codigo, fecha)
+    if len(errores) > 0:
+        return False, " ".join(errores)
+    herramienta = obtener_herramienta(datos, codigo)
+    herramienta["recepcion_confirmada_por"] = usuario["nombre"]
+    herramienta["recepcion_fecha"] = fecha_a_texto(fecha)
+    agregar_movimiento(datos, "recepcion", herramienta, herramienta["ubicacion"],
+                       herramienta["ubicacion"], usuario["nombre"], usuario, fecha,
+                       observaciones.strip(), ahora)
+    return True, ("Operación exitosa: recepción confirmada. " + herramienta["codigo"] + " fue "
+                  "recibida en " + herramienta["ubicacion"] + " por " + usuario["nombre"] + ".")
+
+
+def proceso_confirmar_recepcion(datos, usuario):
+    """Opción 2.7 en consola."""
+    mostrar_titulo("2.7 CONFIRMAR RECEPCIÓN EN OBRA")
+    por_recibir = herramientas_por_recibir(datos, usuario)
+    if len(por_recibir) == 0:
+        print("No hay herramientas pendientes de confirmar.")
+        return
+    mostrar_lista("Herramientas por confirmar:", por_recibir)
+    herramienta = seleccionar_herramienta(datos)
+    if herramienta is None:
+        print(MENSAJE_CANCELADO)
+        return
+    motivo = motivo_bloqueo_recepcion(usuario, herramienta)
+    if motivo != "":
+        print("No se puede confirmar: " + motivo)
+        return
+    salida = texto_a_fecha(herramienta["fecha_salida"])
+    while True:
+        fecha = leer_fecha_hora("Fecha y hora de recepción", momento_actual(None))
+        if salida is None or fecha >= salida:
+            break
+        print("La recepción no puede ser anterior a la salida ("
+              + fecha_para_mostrar(herramienta["fecha_salida"]) + ").")
+    observaciones = leer_texto_opcional("Observaciones (opcional, Enter para omitir): ")
+    mostrar_resumen([("Herramienta", descripcion_corta(herramienta)),
+                     ("Obra", nombre_obra(datos, herramienta["ubicacion"])),
+                     ("Fecha de recepción", fecha.strftime("%d/%m/%Y %H:%M")),
+                     ("Recibe", usuario["nombre"])])
+    if not confirmar("¿Confirmar operación?"):
+        print(MENSAJE_CANCELADO)
+        return
+    exito, mensaje = registrar_recepcion(datos, usuario, herramienta["codigo"], fecha, observaciones)
+    print("\n" + mensaje)
+    if exito:
+        guardar_datos(datos)
+
+
+# =====================================================================
+# 2.8 Registrar mantenimiento
+# =====================================================================
+
+def herramientas_para_mantenimiento(datos):
+    """Herramientas en Bodega con plan de mantenimiento; primero las más cercanas a vencer."""
+    lista = []
+    for herramienta in datos["herramientas"]:
+        if motivo_bloqueo_mantenimiento(herramienta) == "":
+            lista.append(herramienta)
+    return sorted(lista, key=lambda h: h.get("horas_uso", 0) / intervalo_mantenimiento(h),
+                  reverse=True)
+
+
+def motivo_bloqueo_mantenimiento(herramienta):
+    """Explica por qué no se puede registrar. Texto vacío = sí se puede."""
+    codigo = herramienta["codigo"]
+    if intervalo_mantenimiento(herramienta) == 0:
+        return (codigo + " no tiene horas de mantenimiento configuradas. Agréguelas en "
+                         "1.3 Modificar herramienta según su ficha técnica.")
+    if herramienta["estado"] == "dada de baja":
+        return codigo + " está dada de baja."
+    if herramienta["ubicacion"] != "Bodega":
+        return (codigo + " está en la obra " + herramienta["ubicacion"]
+                + ": registre primero la devolución.")
+    return ""
+
+
+def validar_mantenimiento(datos, usuario, codigo, fecha, realizado_por):
+    """Revisa las reglas del mantenimiento. Devuelve la lista de errores."""
+    if not tiene_permiso(usuario, "2.8"):
+        return [MENSAJE_SIN_PERMISO]
+    errores = []
+    herramienta = herramienta_o_error(datos, codigo, errores)
+    if herramienta is None:
+        return errores
+    motivo = motivo_bloqueo_mantenimiento(herramienta)
+    if motivo != "":
+        return [motivo]
+    if fecha is None:
+        errores.append("Fecha inválida. Use el formato DD/MM/AAAA HH:MM.")
+    if realizado_por.strip() == "":
+        errores.append("Indique quién hizo el mantenimiento.")
+    return errores
+
+
+def registrar_mantenimiento(datos, usuario, codigo, fecha, realizado_por, observaciones="",
+                            ahora=None):
+    """Registra el mantenimiento y pone el contador en 0. Devuelve (exito, mensaje)."""
+    errores = validar_mantenimiento(datos, usuario, codigo, fecha, realizado_por)
+    if len(errores) > 0:
+        return False, " ".join(errores)
+    herramienta = obtener_herramienta(datos, codigo)
+    uso_anterior = texto_de_uso(herramienta)
+    agregar_movimiento(datos, "mantenimiento", herramienta, "Bodega", "Bodega", realizado_por.strip(),
+                       usuario, fecha, ("Tenía " + uso_anterior + ". " + observaciones.strip()).strip(),
+                       ahora)
+    herramienta["horas_uso"] = 0
+    herramienta["ultimo_mantenimiento"] = fecha_a_texto(fecha)
+    return True, ("Operación exitosa: mantenimiento registrado. " + herramienta["codigo"]
+                  + " tenía " + uso_anterior + " y ahora tiene " + texto_de_uso(herramienta) + ".")
+
+
+def proceso_registrar_mantenimiento(datos, usuario):
+    """Opción 2.8 en consola."""
+    mostrar_titulo("2.8 REGISTRAR MANTENIMIENTO")
+    candidatas = herramientas_para_mantenimiento(datos)
+    if len(candidatas) == 0:
+        print("No hay herramientas en bodega con horas de mantenimiento configuradas.")
+        return
+    print("Herramientas con plan de mantenimiento:")
+    for herramienta in candidatas:
+        print("  -", herramienta["codigo"], "-", herramienta["nombre"], "|", texto_de_uso(herramienta))
+    herramienta = seleccionar_herramienta(datos)
+    if herramienta is None:
+        print(MENSAJE_CANCELADO)
+        return
+    motivo = motivo_bloqueo_mantenimiento(herramienta)
+    if motivo != "":
+        print("No se puede registrar: " + motivo)
+        return
+    fecha = leer_fecha_hora("Fecha y hora del mantenimiento", momento_actual(None))
+    realizado_por = leer_texto_no_vacio("Quién hizo el mantenimiento: ")
+    observaciones = leer_texto_opcional("Observaciones (opcional, Enter para omitir): ")
+    mostrar_resumen([("Herramienta", descripcion_corta(herramienta)),
+                     ("Horas actuales", texto_de_uso(herramienta) + " (vuelven a 0)"),
+                     ("Fecha", fecha.strftime("%d/%m/%Y %H:%M")),
+                     ("Realizado por", realizado_por)])
+    if not confirmar("¿Confirmar operación?"):
+        print(MENSAJE_CANCELADO)
+        return
+    exito, mensaje = registrar_mantenimiento(datos, usuario, herramienta["codigo"], fecha,
+                                             realizado_por, observaciones)
     print("\n" + mensaje)
     if exito:
         guardar_datos(datos)

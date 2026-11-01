@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block contenido %}
+<section class="tarjeta">
+  <h1>Ficha técnica de {{ herramienta.codigo }}</h1>
+  <p class="suave">{{ herramienta.nombre }} · {{ herramienta.marca }}</p>
+  {% if resultado %}
+    <p class="alerta {% if resultado[0] %}exito{% else %}error{% endif %}" role="{% if resultado[0] %}status{% else %}alert{% endif %}">{{ resultado[1] }}</p>
+  {% endif %}
+  <dl>
+    <dt>Mantenimiento</dt><dd>{{ uso or 'Sin horas configuradas' }}</dd>
+    <dt>Resumen</dt><dd>{{ herramienta.ficha_tecnica or 'Sin resumen' }}</dd>
+    <dt>Archivo</dt>
+    <dd>{% if herramienta.ficha_archivo %}<a href="{{ url_for('ficha_archivo', codigo=herramienta.codigo) }}" target="_blank" rel="noopener">Abrir ficha técnica</a>{% else %}Sin archivo{% endif %}</dd>
+  </dl>
+  {% if puede_editar %}
+  <form method="post" enctype="multipart/form-data" class="formulario">
+    <input type="hidden" name="token" value="{{ token }}">
+    <label for="archivo">{{ 'Reemplazar' if herramienta.ficha_archivo else 'Subir' }} archivo (PDF, JPG o PNG, máximo 5 MB)</label>
+    <input id="archivo" name="archivo" type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" required>
+    <button class="boton-grande" type="submit" data-enviando="Subiendo...">Guardar archivo</button>
+  </form>
+  <a class="boton-grande secundario" href="{{ url_for('opcion', id_opcion='1.3', codigo=herramienta.codigo) }}">Cambiar resumen u horas de mantenimiento</a>
+  {% endif %}
+  <a class="boton-grande secundario" href="{{ url_for('buscar', q=herramienta.codigo) }}">Volver a la herramienta</a>
+</section>
+{% endblock %}

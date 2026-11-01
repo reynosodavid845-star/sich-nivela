@@ -10,11 +10,14 @@
   {% endif %}
   <form method="post" class="formulario">
     <input type="hidden" name="token" value="{{ token }}">
-    <input type="hidden" name="paso" value="revisar">
+    <input type="hidden" name="paso" value="{{ 'elegir' if solo_elegir else 'revisar' }}">
     {% for campo in campos %}
     <div class="campo" id="caja-{{ campo.nombre }}">
       <label for="{{ campo.nombre }}">{{ campo.etiqueta }}</label>
-      {% if campo.tipo == "select" %}
+      {% if campo.tipo == "fijo" %}
+        <p class="valor-fijo">{{ campo.texto }}</p>
+        <input type="hidden" name="{{ campo.nombre }}" value="{{ campo.valor }}">
+      {% elif campo.tipo == "select" %}
         {% if campo.opciones|length == 0 %}
           <p class="alerta aviso">No hay opciones para elegir en este momento.</p>
         {% elif campo.nombre == "codigo" and campo.opciones|length > 4 %}
@@ -26,18 +29,22 @@
             <option value="{{ valor }}" {% if valor == campo.valor %}selected{% endif %}>{{ texto_opcion }}</option>
           {% endfor %}
         </select>
+      {% elif campo.tipo == "numero" %}
+        <input id="{{ campo.nombre }}" name="{{ campo.nombre }}" type="number" min="0" step="1" inputmode="numeric" value="{{ campo.valor }}" required>
       {% elif campo.tipo == "fecha" %}
         <input id="{{ campo.nombre }}" name="{{ campo.nombre }}" type="datetime-local" value="{{ campo.valor }}" required>
       {% else %}
         <input id="{{ campo.nombre }}" name="{{ campo.nombre }}" value="{{ campo.valor }}" maxlength="200"
-               {% if campo.nombre in ['responsable', 'revisor', 'residente_autoriza'] %}list="personal" autocomplete="off"{% endif %}>
+               {% if campo.nombre in ['responsable', 'revisor', 'residente_autoriza', 'realizado_por'] %}list="personal" autocomplete="off"{% endif %}
+               {% if campo.lista %}list="{{ campo.lista }}" autocomplete="off"{% endif %}>
       {% endif %}
       {% if campo.ayuda %}<small class="ayuda">{{ campo.ayuda }}</small>{% endif %}
     </div>
     {% endfor %}
     <datalist id="personal">{% for nombre in personal %}<option value="{{ nombre }}">{% endfor %}</datalist>
-    <button class="boton-grande" type="submit" data-enviando="Revisando...">Revisar y continuar</button>
+    <datalist id="categorias">{% for categoria in categorias %}<option value="{{ categoria }}">{% endfor %}</datalist>
+    <button class="boton-grande" type="submit" data-enviando="Revisando...">{{ 'Continuar' if solo_elegir else 'Revisar y continuar' }}</button>
   </form>
-  <a class="boton-grande secundario" href="{{ url_for('submenu', numero='2') }}">Regresar</a>
+  <a class="boton-grande secundario" href="{{ url_for('submenu', numero=numero_menu) }}">Regresar</a>
 </section>
 {% endblock %}

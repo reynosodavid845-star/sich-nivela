@@ -5,4 +5,5 @@ __pycache__/
 venv/
 *.zip
 ~$*
-datos/codigo_configuracion.txt
+datos/
+evidencias/

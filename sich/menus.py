@@ -5,13 +5,16 @@ página web, para que ambas versiones tengan exactamente las mismas opciones.
 """
 
 from sich.autenticacion import MENSAJE_SIN_PERMISO, NOMBRES_ROL, tiene_permiso
-from sich.consultas import proceso_buscar_herramienta
-from sich.movimientos import proceso_autorizar_permanencia, proceso_registrar_devolucion, \
-    proceso_registrar_revision, proceso_registrar_salida, proceso_registrar_traslado, \
-    proceso_reportar_dano
+from sich.consultas import proceso_buscar_herramienta, proceso_consultar_disponibles, \
+    proceso_consultar_historial, proceso_consultar_mantenimiento, proceso_consultar_pendientes, \
+    proceso_consultar_por_obra
+from sich.herramientas import proceso_asociar_apodos, proceso_modificar_herramienta, \
+    proceso_registrar_herramienta
+from sich.movimientos import proceso_autorizar_permanencia, proceso_confirmar_recepcion, \
+    proceso_registrar_devolucion, proceso_registrar_mantenimiento, proceso_registrar_revision, \
+    proceso_registrar_salida, \
+    proceso_registrar_traslado, proceso_reportar_dano
 from sich.validaciones import leer_opcion, mostrar_titulo, pausar
-
-MENSAJE_PENDIENTE = "Funcionalidad pendiente de implementación"
 
 MENU_PRINCIPAL = [
     ("1", "Catálogo de herramientas"),
@@ -35,6 +38,8 @@ SUBMENUS = {
         ("2.4", "Reportar daño"),
         ("2.5", "Registrar revisión"),
         ("2.6", "Autorizar permanencia en obra"),
+        ("2.7", "Confirmar recepción en obra"),
+        ("2.8", "Registrar mantenimiento"),
     ]),
     "3": ("3. CONSULTAS Y SEGUIMIENTO", [
         ("3.1", "Buscar herramienta"),
@@ -42,44 +47,45 @@ SUBMENUS = {
         ("3.3", "Devoluciones pendientes"),
         ("3.4", "Herramientas por obra"),
         ("3.5", "Historial de una herramienta"),
+        ("3.6", "Estado de mantenimiento"),
     ]),
 }
 
-# Opciones ya programadas. Las demás muestran MENSAJE_PENDIENTE.
-FUNCIONES_IMPLEMENTADAS = {
+# Función que atiende cada opción del menú.
+FUNCIONES = {
+    "1.1": proceso_registrar_herramienta,
+    "1.2": proceso_asociar_apodos,
+    "1.3": proceso_modificar_herramienta,
     "2.1": proceso_registrar_salida,
     "2.2": proceso_registrar_devolucion,
     "2.3": proceso_registrar_traslado,
     "2.4": proceso_reportar_dano,
     "2.5": proceso_registrar_revision,
     "2.6": proceso_autorizar_permanencia,
+    "2.7": proceso_confirmar_recepcion,
+    "2.8": proceso_registrar_mantenimiento,
     "3.1": proceso_buscar_herramienta,
+    "3.2": proceso_consultar_disponibles,
+    "3.3": proceso_consultar_pendientes,
+    "3.4": proceso_consultar_por_obra,
+    "3.5": proceso_consultar_historial,
+    "3.6": proceso_consultar_mantenimiento,
 }
 
 
-def esta_implementada(id_opcion):
-    """True si la opción ya está programada."""
-    return id_opcion in FUNCIONES_IMPLEMENTADAS
-
-
 def etiqueta_opcion(usuario, id_opcion, texto):
-    """Texto de una opción con sus marcas de permiso y de pendiente."""
-    etiqueta = texto
+    """Texto de una opción, marcada si el rol no tiene permiso."""
     if not tiene_permiso(usuario, id_opcion):
-        etiqueta = etiqueta + "  [sin permiso]"
-    elif not esta_implementada(id_opcion):
-        etiqueta = etiqueta + "  [pendiente]"
-    return etiqueta
+        return texto + "  [sin permiso]"
+    return texto
 
 
 def ejecutar_opcion(datos, usuario, id_opcion):
-    """Revisa el permiso y ejecuta la opción, o avisa que está pendiente."""
+    """Revisa el permiso y ejecuta la opción."""
     if not tiene_permiso(usuario, id_opcion):
         print("\n" + MENSAJE_SIN_PERMISO)
-    elif not esta_implementada(id_opcion):
-        print("\n" + MENSAJE_PENDIENTE)
     else:
-        FUNCIONES_IMPLEMENTADAS[id_opcion](datos, usuario)
+        FUNCIONES[id_opcion](datos, usuario)
     pausar()
 
 

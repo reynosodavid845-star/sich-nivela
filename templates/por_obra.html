@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block contenido %}
+<h1>{{ titulo }}</h1>
+{% if es_maestro %}
+  <p class="suave">Su obra: <strong>{{ nombre }}</strong></p>
+{% else %}
+<form method="get" class="tarjeta formulario">
+  <label for="obra">Obra</label>
+  <select id="obra" name="obra" required>
+    <option value="">Elija una obra</option>
+    {% for valor, texto_obra in obras %}<option value="{{ valor }}" {% if valor == codigo_obra %}selected{% endif %}>{{ texto_obra }}</option>{% endfor %}
+    <option value="Bodega" {% if codigo_obra == 'Bodega' %}selected{% endif %}>Bodega</option>
+  </select>
+  <button class="boton-grande" type="submit">Consultar</button>
+</form>
+{% endif %}
+{% if error %}<p class="alerta error" role="alert">{{ error }}</p>
+{% elif lista %}
+  <p class="suave" role="status">{{ lista|length }} herramienta(s) en {{ nombre }}</p>
+  <div class="resultados">
+  {% for e in lista %}
+    <article class="tarjeta">
+      <h2>{{ e.herramienta.codigo }} · {{ e.herramienta.nombre }}
+        <span class="etiqueta estado-{{ e.herramienta.estado|replace(' ', '-')|replace('ñ', 'n') }}">{{ e.herramienta.estado|upper }}</span>
+        {% if e.vencida %}<span class="etiqueta estado-vencida">VENCIDA</span>{% endif %}
+      </h2>
+      <dl>
+        <dt>Responsable</dt><dd>{{ e.herramienta.responsable or '-' }}</dd>
+        <dt>Devolución esperada</dt><dd>{{ e.herramienta.devolucion_esperada|fecha }}</dd>
+        {% if e.herramienta.ubicacion != 'Bodega' %}
+        <dt>Recepción</dt><dd>{{ e.herramienta.recepcion_confirmada_por or 'Sin confirmar' }}</dd>
+        {% endif %}
+      </dl>
+    </article>
+  {% endfor %}
+  </div>
+{% elif codigo_obra %}
+  <p class="alerta aviso" role="status">No hay herramientas en {{ nombre }}.</p>
+{% endif %}
+<a class="boton-grande secundario" href="{{ url_for('submenu', numero='3') }}">Regresar</a>
+{% endblock %}

@@ -2,13 +2,18 @@
 {% block contenido %}
 {% for aviso in avisos %}<p class="alerta aviso">{{ aviso }}</p>{% endfor %}
 <p class="suave saludo">Hoy: {{ hoy }}</p>
+{% if resumen.mantenimiento > 0 %}
+  <p class="alerta error" role="alert"><strong>Alarma de mantenimiento:</strong>
+    {{ resumen.mantenimiento }} herramienta(s) llegaron a sus horas y no se pueden entregar.
+    {% if ver_mantenimiento %}<a href="{{ url_for('consulta', id_opcion='3.6') }}">Ver cuáles</a>{% endif %}</p>
+{% endif %}
 <section class="tablero" aria-label="Resumen de herramientas">
-  <div class="cuadro estado-disponible"><span class="numero">{{ resumen.disponibles }}</span>
-    <span class="nombre">Disponibles</span><small>Listas en bodega</small></div>
-  <div class="cuadro estado-asignada"><span class="numero">{{ resumen.asignadas }}</span>
-    <span class="nombre">Asignadas en obra</span><small>Con responsable</small></div>
-  <div class="cuadro estado-vencida"><span class="numero">{{ resumen.vencidas }}</span>
-    <span class="nombre">Pendientes vencidas</span><small>Pasó su hora y sin permiso</small></div>
+  <a class="cuadro estado-disponible" {% if ver_disponibles %}href="{{ url_for('consulta', id_opcion='3.2') }}"{% endif %}><span class="numero">{{ resumen.disponibles }}</span>
+    <span class="nombre">Disponibles</span><small>Listas en bodega</small></a>
+  <a class="cuadro estado-asignada" {% if ver_pendientes %}href="{{ url_for('consulta', id_opcion='3.3') }}"{% endif %}><span class="numero">{{ resumen.asignadas }}</span>
+    <span class="nombre">Asignadas en obra</span><small>Con responsable</small></a>
+  <a class="cuadro estado-vencida" {% if ver_pendientes %}href="{{ url_for('consulta', id_opcion='3.3', ver='vencidas') }}"{% endif %}><span class="numero">{{ resumen.vencidas }}</span>
+    <span class="nombre">Pendientes vencidas</span><small>Pasó su hora y sin permiso</small></a>
   <div class="cuadro estado-danada"><span class="numero">{{ resumen.danadas }}</span>
     <span class="nombre">Dañadas / en revisión</span><small>No pueden salir</small></div>
 </section>

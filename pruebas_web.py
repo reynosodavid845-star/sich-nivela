@@ -69,7 +69,7 @@ def caso_login_y_bloqueo():
 
 def caso_sin_token():
     c = nuevo_cliente("jpivaral", "bodega123")
-    r = c.post("/movimientos/2.1", data={"paso": "guardar", "codigo": "COM-01"})
+    r = c.post("/operacion/2.1", data={"paso": "guardar", "codigo": "COM-01"})
     return r.status_code == 400 and "La página expiró" in texto_de(r)
 
 
@@ -78,8 +78,8 @@ def caso_salida_completa():
     datos = {"codigo": "COM-01", "codigo_obra": "VN-014", "responsable": "Erick Santos",
              "fecha_salida": "2026-10-16T06:15", "devolucion_esperada": "2026-10-16T17:00",
              "residente_autoriza": "", "observaciones": ""}
-    confirmar = enviar(c, "/movimientos/2.1", dict(datos, paso="revisar"))
-    guardar = enviar(c, "/movimientos/2.1", dict(datos, paso="guardar"))
+    confirmar = enviar(c, "/operacion/2.1", dict(datos, paso="revisar"))
+    guardar = enviar(c, "/operacion/2.1", dict(datos, paso="guardar"))
     guardados, avisos = cargar_datos()
     return ("¿Confirmar operación?" in texto_de(confirmar)
             and "Operación exitosa" in texto_de(guardar)
@@ -88,7 +88,7 @@ def caso_salida_completa():
 
 def caso_reglas_compartidas():
     c = nuevo_cliente("jpivaral", "bodega123")
-    r = enviar(c, "/movimientos/2.1", {"paso": "revisar", "codigo": "COM-02", "codigo_obra": "VN-014",
+    r = enviar(c, "/operacion/2.1", {"paso": "revisar", "codigo": "COM-02", "codigo_obra": "VN-014",
                                         "responsable": "x", "fecha_salida": "2026-10-16T06:15",
                                         "devolucion_esperada": "2026-10-16T17:00"})
     return "COM-02 requiere revisión (memorando" in texto_de(r)
@@ -99,21 +99,32 @@ def caso_accesos_rapidos_por_rol():
     residente = texto_de(nuevo_cliente("ecifuentes", "residente123").get("/"))
     gerente = texto_de(nuevo_cliente("prodas", "gerente123").get("/"))
     return ("Sacar herramienta a obra" in bodega and "Trasladar entre obras" not in bodega
-            and "Trasladar entre obras" in residente and "¿Qué necesita hacer?" not in gerente)
+            and "Trasladar entre obras" in residente and "Sacar herramienta a obra" not in gerente
+            and "Ver devoluciones pendientes" in gerente)
 
 
 def caso_paginas_de_error_y_sesion():
     c = aplicacion.app.test_client()
-    sin_sesion = c.get("/movimientos/2.1", follow_redirects=True)
+    sin_sesion = c.get("/operacion/2.1", follow_redirects=True)
     no_existe = nuevo_cliente("jpivaral", "bodega123").get("/no-existe")
     return ("Inicie sesión para continuar" in texto_de(sin_sesion)
             and no_existe.status_code == 404 and "Página no encontrada" in texto_de(no_existe))
 
 
-def caso_pendiente_y_permiso():
-    c = nuevo_cliente("prodas", "gerente123")
-    return ("No tiene permisos para esta opción" in texto_de(c.get("/opcion/2.1"))
-            and "Funcionalidad pendiente de implementación" in texto_de(c.get("/opcion/3.2")))
+def caso_ninguna_pendiente():
+    """Ninguna opción de ningún menú queda pendiente; el permiso se sigue respetando."""
+    from sich.menus import SUBMENUS
+    c, texto = entrar("jpivaral", "bodega123")
+    sin_pendientes = True
+    for numero in SUBMENUS:
+        pagina = texto_de(c.get("/menu/" + numero))
+        sin_pendientes = sin_pendientes and "Pendiente" not in pagina.replace("Devoluciones pendientes", "")
+        for id_opcion, nombre in SUBMENUS[numero][1]:
+            r = c.get("/opcion/" + id_opcion, follow_redirects=True)
+            sin_pendientes = sin_pendientes and r.status_code == 200
+            sin_pendientes = sin_pendientes and "pendiente de implementación" not in texto_de(r)
+    gerente, otro = entrar("prodas", "gerente123")
+    return sin_pendientes and "No tiene permisos para esta opción" in texto_de(gerente.get("/opcion/2.1"))
 
 
 def caso_bloqueo_por_ip():
@@ -177,6 +188,135 @@ def caso_contrasenas_de_entorno():
                 and "Bienvenido(a), Ing. Esteban Cifuentes" in texto_de(nueva))
     finally:
         del os.environ["SICH_CONTRASENA_ECIFUENTES"]
+
+
+def caso_catalogo_web():
+    """Registrar, asociar apodos y modificar desde la página."""
+    c, texto = entrar("jpivaral", "bodega123")
+    nueva = {"codigo": "gen-01", "nombre": "Generador", "categoria": "Eléctrico", "marca": "Honda",
+             "estado": "disponible", "motor_o_cable": "si", "observaciones": "",
+             "ficha_tecnica": "Revisar cada 400 h", "mantenimiento_cada_horas": "400"}
+    confirmar = enviar(c, "/operacion/1.1", dict(nueva, paso="revisar"))
+    guardar = enviar(c, "/operacion/1.1", dict(nueva, paso="guardar"))
+    duplicada = enviar(c, "/operacion/1.1", dict(nueva, paso="revisar"))
+    apodos = enviar(c, "/operacion/1.2", {"codigo": "GEN-01", "apodos": "la planta", "paso": "guardar"})
+    encontrada = "GEN-01" in texto_de(c.get("/buscar", query_string={"q": "la planta"}))
+    elegir = enviar(c, "/operacion/1.3", {"codigo": "GEN-01", "paso": "elegir"})
+    cambio = enviar(c, "/operacion/1.3", {"codigo": "GEN-01", "nombre": "Generador grande",
+                                          "categoria": "Eléctrico", "marca": "Honda",
+                                          "motor_o_cable": "si", "observaciones": "",
+                                          "ficha_tecnica": "Revisar cada 400 h",
+                                          "mantenimiento_cada_horas": "400",
+                                          "estado": "disponible", "paso": "guardar"})
+    datos, avisos = cargar_datos()
+    return ("¿Confirmar operación?" in texto_de(confirmar) and "herramienta registrada" in texto_de(guardar)
+            and "Ya existe una herramienta" in texto_de(duplicada)
+            and "apodos asociados" in texto_de(apodos) and encontrada
+            and 'value="Generador"' in elegir.get_data(as_text=True)
+            and "GEN-01 actualizada" in texto_de(cambio)
+            and obtener_herramienta(datos, "GEN-01")["nombre"] == "Generador grande")
+
+
+def caso_consultas_web():
+    """Las consultas 3.2 a 3.5 muestran resultados reales."""
+    c, texto = entrar("jpivaral", "bodega123")
+    disponibles = texto_de(c.get("/consulta/3.2?criterio=perforacion"))
+    pendientes = texto_de(c.get("/consulta/3.3"))
+    vencidas = texto_de(c.get("/consulta/3.3?ver=vencidas"))
+    por_obra = texto_de(c.get("/consulta/3.4?obra=VN-014"))
+    historial = texto_de(c.get("/consulta/3.5?codigo=COM-02"))
+    maestro, otro = entrar("esantos", "maestro123")
+    obra_maestro = texto_de(maestro.get("/consulta/3.4?obra=VN-014"))
+    return ("ROT-01" in disponibles and "COM-01" not in disponibles
+            and "VENCIDA" in pendientes and "PERMANENCIA AUTORIZADA" in pendientes
+            and "NIV-LAS-01" not in vencidas and "MEZ-01" in por_obra
+            and "Daños (1)" in historial and "26/06/2026" in historial
+            and "ROT-02" in obra_maestro and "MEZ-01" not in obra_maestro)
+
+
+def caso_recepcion_web():
+    """El maestro confirma lo de su obra, no lo de otra."""
+    c, texto = entrar("esantos", "maestro123")
+    otra = enviar(c, "/operacion/2.7", {"codigo": "MEZ-01", "fecha": "2026-10-16T07:00", "paso": "revisar"})
+    propia = enviar(c, "/operacion/2.7", {"codigo": "ROT-02", "fecha": "2026-10-14T07:00",
+                                          "observaciones": "", "paso": "guardar"})
+    datos, avisos = cargar_datos()
+    return ("solo puede confirmar las de su obra" in texto_de(otra)
+            and "recepción confirmada" in texto_de(propia)
+            and obtener_herramienta(datos, "ROT-02")["recepcion_confirmada_por"] == "Erick Santos")
+
+
+def caso_contrasena_antigua():
+    """Una contraseña guardada con el SHA-256 anterior sigue entrando y se actualiza sola."""
+    import hashlib
+    from sich.datos import guardar_datos
+    datos, avisos = cargar_datos()
+    datos["usuarios"][0]["contrasena"] = hashlib.sha256("Vieja-Clave-1".encode("utf-8")).hexdigest()
+    guardar_datos(datos)
+    c, texto = entrar("jpivaral", "Vieja-Clave-1")
+    datos, avisos = cargar_datos()
+    return ("Bienvenido(a), Julián" in texto
+            and datos["usuarios"][0]["contrasena"].startswith("pbkdf2_sha256$")
+            and "Vieja-Clave-1" not in datos["usuarios"][0]["contrasena"])
+
+
+def caso_mantenimiento_web():
+    """Las horas suman, la alarma bloquea la salida y el mantenimiento la libera."""
+    c, texto = entrar("jpivaral", "bodega123")
+    alarma_inicio = "Alarma de mantenimiento" in texto
+    salida = {"codigo": "MEZ-03", "codigo_obra": "VN-014", "responsable": "Luis",
+              "fecha_salida": "2026-10-31T07:00", "devolucion_esperada": "2026-10-31T17:00",
+              "residente_autoriza": "", "observaciones": ""}
+    bloqueada = enviar(c, "/operacion/2.1", dict(salida, paso="revisar"))
+    estado = texto_de(c.get("/consulta/3.6"))
+    mantenimiento = enviar(c, "/operacion/2.8", {"codigo": "MEZ-03", "fecha": "2026-10-31T10:00",
+                                                 "realizado_por": "Taller", "observaciones": "",
+                                                 "paso": "guardar"})
+    libre = enviar(c, "/operacion/2.1", dict(salida, paso="guardar"))
+    devolucion = enviar(c, "/operacion/2.2", {"codigo": "MEZ-03", "fecha_devolucion": "2026-10-31T19:00",
+                                              "estado_recibido": "bueno", "observaciones": "",
+                                              "paso": "guardar"})
+    sin_sesion = aplicacion.app.test_client().get("/operacion/2.8")
+    return (alarma_inicio and "ALARMA DE MANTENIMIENTO" in texto_de(bloqueada)
+            and "VENCIDO" in estado and "ahora tiene 0 de 250 h" in texto_de(mantenimiento)
+            and "salida registrada" in texto_de(libre)
+            and "sumó 12 h (lleva 12 de 250 h)" in texto_de(devolucion)
+            and sin_sesion.status_code == 302)
+
+
+def caso_ficha_tecnica_web():
+    """Subir, reemplazar y abrir la ficha; se rechaza lo que no es PDF, JPG o PNG."""
+    import io
+    c, texto = entrar("jpivaral", "bodega123")
+    pagina = c.get("/ficha/COM-01")
+    token = token_de(pagina)
+
+    def subir(contenido, nombre):
+        return c.post("/ficha/COM-01", data={"token": token, "archivo": (io.BytesIO(contenido), nombre)},
+                      content_type="multipart/form-data")
+
+    falso = subir(b"<script>alert(1)</script>", "ficha.pdf")
+    vacio = subir(b"", "vacio.pdf")
+    grande = subir(b"%PDF-" + b"0" * (5 * 1024 * 1024), "grande.pdf")
+    pdf = subir(b"%PDF-1.4 ficha", "ficha.pdf")
+    abierto = c.get("/ficha/COM-01/archivo")
+    png = subir(b"\x89PNG\r\n\x1a\n" + b"0" * 10, "foto.png")
+    datos, avisos = cargar_datos()
+    gerente, otro = entrar("prodas", "gerente123")
+    puede_ver = gerente.get("/ficha/COM-01/archivo").status_code == 200
+    no_edita = "Guardar archivo" not in texto_de(gerente.get("/ficha/COM-01"))
+    with gerente.session_transaction() as sesion:
+        token_gerente = sesion.get("token", "")
+    no_sube = gerente.post("/ficha/COM-01", data={"token": token_gerente,
+                                                  "archivo": (io.BytesIO(b"%PDF-1"), "x.pdf")},
+                           content_type="multipart/form-data")
+    anonimo = aplicacion.app.test_client().get("/ficha/COM-01/archivo").status_code
+    return ("debe ser PDF, JPG o PNG" in texto_de(falso) and "Elija un archivo" in texto_de(vacio)
+            and "más de 5 MB" in texto_de(grande) and "ficha técnica de COM-01 guardada" in texto_de(pdf)
+            and abierto.data == b"%PDF-1.4 ficha"
+            and "guardada" in texto_de(png)
+            and obtener_herramienta(datos, "COM-01")["ficha_archivo"] == "com01.png"
+            and puede_ver and no_edita and "No tiene permisos" in texto_de(no_sube) and anonimo == 302)
 
 
 def entrar(usuario, contrasena):
@@ -274,7 +414,7 @@ CASOS = [
     ("W-05", "La web aplica las mismas reglas que la consola", caso_reglas_compartidas),
     ("W-06", "Accesos rápidos según el rol", caso_accesos_rapidos_por_rol),
     ("W-07", "Sesión vencida y página inexistente", caso_paginas_de_error_y_sesion),
-    ("W-08", "Opción sin permiso y opción pendiente", caso_pendiente_y_permiso),
+    ("W-08", "Ninguna opción queda pendiente y se respetan los permisos", caso_ninguna_pendiente),
     ("W-09", "Bloqueo por IP aunque se borren las cookies", caso_bloqueo_por_ip),
     ("W-10", "App instalable: manifiesto, service worker, sin conexión, íconos", caso_app_instalable),
     ("W-11", "Versión publicada rechaza contraseñas de prueba", caso_modo_publico),
@@ -283,6 +423,12 @@ CASOS = [
     ("W-14", "El propietario crea cuentas; los demás no pueden", caso_crear_cuentas),
     ("W-15", "Restablecer contraseña y desactivar una cuenta", caso_restablecer_y_desactivar),
     ("W-16", "Cada usuario cambia su propia contraseña", caso_mi_contrasena),
+    ("W-17", "Catálogo: registrar, asociar apodos y modificar", caso_catalogo_web),
+    ("W-18", "Consultas 3.2 a 3.5 con resultados reales", caso_consultas_web),
+    ("W-19", "Confirmar recepción: solo la obra del maestro", caso_recepcion_web),
+    ("W-20", "Contraseña antigua entra y se actualiza a PBKDF2", caso_contrasena_antigua),
+    ("W-21", "Horas de uso, alarma y registro de mantenimiento", caso_mantenimiento_web),
+    ("W-22", "Ficha técnica: subir, reemplazar, abrir y permisos", caso_ficha_tecnica_web),
 ]
 
 

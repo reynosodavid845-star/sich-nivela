@@ -21,12 +21,14 @@ from sich.autenticacion import MAXIMO_INTENTOS, MENSAJE_SIN_PERMISO, NOMBRES_ROL
     tiene_permiso, verificar_credenciales
 from sich.busqueda import buscar_con_detalle
 from sich.catalogo import descripcion_corta, nombre_obra, obras_activas, obtener_herramienta
-from sich import cuentas
+from sich import consultas, cuentas, herramientas
 from sich.consultas import detalle_herramienta, resumen_tablero
-from sich.datos import cargar_datos, cifrar_contrasena, guardar_datos, usuarios_iniciales
-from sich.menus import MENSAJE_PENDIENTE, MENU_PRINCIPAL, SUBMENUS, esta_implementada
+from sich.datos import cargar_datos, cifrar_contrasena, es_contrasena_de_demostracion, guardar_datos
+from sich.menus import MENU_PRINCIPAL, SUBMENUS
+from sich.validaciones import fecha_para_mostrar
 
 app = Flask(__name__)
+app.jinja_env.filters["fecha"] = fecha_para_mostrar   # {{ dato|fecha }} -> DD/MM/AAAA HH:MM
 
 # Al publicar en internet (HTTPS) se define SICH_PUBLICO=1 (wsgi.py lo hace solo):
 # la cookie solo viaja cifrada y las contraseñas de prueba dejan de funcionar.
@@ -44,14 +46,12 @@ app.config["SESSION_COOKIE_SAMESITE"] = "Lax"        # la cookie no viaja desde 
 app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 3600       # el navegador guarda CSS y JS por 1 hora
 app.config["SESSION_COOKIE_SECURE"] = PUBLICO
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(hours=12)   # un turno de trabajo
+app.config["MAX_CONTENT_LENGTH"] = herramientas.MAXIMO_BYTES_FICHA + 1024 * 1024
 
-VERSION_ESTATICOS = "5"          # cambiarla obliga al navegador a bajar el CSS/JS nuevo
+VERSION_ESTATICOS = "7"          # cambiarla obliga al navegador a bajar el CSS/JS nuevo
 FORMATO_WEB = "%Y-%m-%dT%H:%M"   # formato de <input type="datetime-local">
 MINUTOS_BLOQUEO = 5              # espera después de 3 intentos fallidos de inicio de sesión
 CARPETA_ESTATICA = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
-
-# Contraseñas de prueba (están en el README): no se aceptan en la versión publicada.
-CONTRASENAS_DE_PRUEBA = [u["contrasena"] for u in usuarios_iniciales()]
 
 # Intentos fallidos por dirección IP: así borrar las cookies no da más intentos.
 # Formato: {ip: [intentos, bloqueado_hasta]}
@@ -93,6 +93,10 @@ ACCESOS_RAPIDOS = [
     ("2.6", "Autorizar que se quede en obra"),
     ("2.4", "Reportar daño"),
     ("2.5", "Registrar revisión"),
+    ("2.7", "Confirmar que llegó a la obra"),
+    ("2.8", "Registrar mantenimiento"),
+    ("3.3", "Ver devoluciones pendientes"),
+    ("3.4", "Ver herramientas por obra"),
 ]
 
 
@@ -131,6 +135,14 @@ def pagina_no_encontrada(error):
                                    "al menú.", tipo="error"), 404
 
 
+@app.errorhandler(413)
+def archivo_muy_grande(error):
+    """El archivo subido supera el máximo permitido."""
+    return render_template("mensaje.html", usuario=None, titulo="Archivo muy grande",
+                           mensaje="El archivo pesa más de 5 MB. Elija uno más liviano.",
+                           tipo="error"), 413
+
+
 @app.errorhandler(500)
 def error_interno(error):
     """Cualquier falla inesperada muestra un mensaje y permite seguir navegando."""
@@ -161,6 +173,14 @@ def leer_fecha_web(texto):
     try:
         return datetime.strptime(texto, FORMATO_WEB)
     except (ValueError, TypeError):
+        return None
+
+
+def leer_entero_web(texto):
+    """Convierte el texto de un campo numérico a entero (None si es inválido)."""
+    try:
+        return int(str(texto).strip())
+    except ValueError:
         return None
 
 
@@ -196,12 +216,96 @@ def opciones_obras(datos):
     return opciones
 
 
-# ------------------------------------------------- formularios del Módulo 2
+# --------------------------------------------- formularios de los Módulos 1 y 2
 
-def campos_de_operacion(datos, id_opcion, valores):
-    """Devuelve la lista de campos del formulario de una operación del Módulo 2."""
+def campos_de_catalogo(datos, id_opcion, valores):
+    """Campos de los formularios del Módulo 1."""
+    codigo = valores.get("codigo", "")
+    if id_opcion == "1.1":
+        estados = []
+        for estado in herramientas.ESTADOS_INICIALES:
+            estados.append((estado, estado.capitalize()))
+        return [
+            {"nombre": "codigo", "etiqueta": "Código oficial (ej. ROT-04)", "tipo": "texto"},
+            {"nombre": "nombre", "etiqueta": "Nombre (ej. Rotomartillo)", "tipo": "texto"},
+            {"nombre": "categoria", "etiqueta": "Categoría", "tipo": "texto", "lista": "categorias"},
+            {"nombre": "marca", "etiqueta": "Marca", "tipo": "texto",
+             "ayuda": "Si no se conoce, escriba Sin marca."},
+            {"nombre": "estado", "etiqueta": "Estado inicial", "tipo": "select", "opciones": estados},
+            {"nombre": "motor_o_cable", "etiqueta": "¿Tiene motor o cable eléctrico?", "tipo": "select",
+             "opciones": [("si", "Sí"), ("no", "No")]},
+            {"nombre": "ficha_tecnica", "etiqueta": "Ficha técnica: resumen o referencia (opcional)",
+             "tipo": "texto", "ayuda": "El PDF o la foto se sube en el paso siguiente."},
+            {"nombre": "mantenimiento_cada_horas", "etiqueta": "Horas entre mantenimientos según la ficha",
+             "tipo": "numero", "defecto": "0",
+             "ayuda": "Ej.: 400. Empieza en 0 de 400 y suma horas con cada salida. 0 = no aplica."},
+            {"nombre": "observaciones", "etiqueta": "Observaciones (opcional)", "tipo": "texto"},
+        ]
+    if id_opcion == "1.2":
+        return [
+            {"nombre": "codigo", "etiqueta": "Herramienta", "tipo": "select",
+             "opciones": opciones_herramientas(datos["herramientas"], codigo, datos)},
+            {"nombre": "apodos", "etiqueta": "Apodos nuevos, separados por coma", "tipo": "texto",
+             "ayuda": "Ej.: rana, bailarina chiquita"},
+        ]
+    # 1.3 Modificar: primero se elige la herramienta y luego se muestran sus datos.
+    herramienta = obtener_herramienta(datos, codigo)
+    if herramienta is None:
+        return [{"nombre": "codigo", "etiqueta": "¿Qué herramienta quiere modificar?", "tipo": "select",
+                 "opciones": opciones_herramientas(datos["herramientas"], "", datos)}]
+    estados = [(herramienta["estado"], "Conservar: " + herramienta["estado"])]
+    for estado in herramientas.estados_permitidos_al_modificar(herramienta):
+        estados.append((estado, "Cambiar a: " + estado))
+    return [
+        {"nombre": "codigo", "etiqueta": "Herramienta (el código no se cambia)", "tipo": "fijo",
+         "texto": descripcion_corta(herramienta)},
+        {"nombre": "nombre", "etiqueta": "Nombre", "tipo": "texto", "defecto": herramienta["nombre"]},
+        {"nombre": "categoria", "etiqueta": "Categoría", "tipo": "texto", "lista": "categorias",
+         "defecto": herramienta["categoria"]},
+        {"nombre": "marca", "etiqueta": "Marca", "tipo": "texto", "defecto": herramienta["marca"]},
+        {"nombre": "motor_o_cable", "etiqueta": "¿Tiene motor o cable eléctrico?", "tipo": "select",
+         "opciones": [("si", "Sí"), ("no", "No")],
+         "defecto": "si" if herramienta["motor_o_cable"] else "no"},
+        {"nombre": "ficha_tecnica", "etiqueta": "Ficha técnica: resumen o referencia", "tipo": "texto",
+         "defecto": herramienta.get("ficha_tecnica", "")},
+        {"nombre": "mantenimiento_cada_horas", "etiqueta": "Horas entre mantenimientos según la ficha",
+         "tipo": "numero", "defecto": str(movimientos.intervalo_mantenimiento(herramienta)),
+         "ayuda": "Lleva " + movimientos.texto_horas(movimientos.horas_de_uso(herramienta))
+                  + " h de uso. 0 = no aplica."},
+        {"nombre": "observaciones", "etiqueta": "Observaciones", "tipo": "texto",
+         "defecto": herramienta["observaciones"]},
+        {"nombre": "estado", "etiqueta": "Estado", "tipo": "select", "opciones": estados,
+         "defecto": herramienta["estado"],
+         "ayuda": "Salidas, devoluciones, daños y revisiones cambian el estado desde su propia opción."},
+    ]
+
+
+def campos_de_operacion(datos, usuario, id_opcion, valores):
+    """Devuelve la lista de campos del formulario de una operación."""
+    if id_opcion.startswith("1."):
+        return campos_de_catalogo(datos, id_opcion, valores)
     ahora = movimientos.momento_actual(None)
     codigo = valores.get("codigo", "")
+    if id_opcion == "2.8":
+        return [
+            {"nombre": "codigo", "etiqueta": "Herramienta (el contador vuelve a 0)", "tipo": "select",
+             "opciones": opciones_herramientas(movimientos.herramientas_para_mantenimiento(datos),
+                                               codigo, datos)},
+            {"nombre": "fecha", "etiqueta": "Fecha y hora del mantenimiento", "tipo": "fecha",
+             "defecto": fecha_web(ahora)},
+            {"nombre": "realizado_por", "etiqueta": "Quién hizo el mantenimiento", "tipo": "texto"},
+            {"nombre": "observaciones", "etiqueta": "Observaciones (opcional)", "tipo": "texto"},
+        ]
+    if id_opcion == "2.7":
+        return [
+            {"nombre": "codigo", "etiqueta": "Herramienta que llegó a la obra", "tipo": "select",
+             "opciones": opciones_herramientas(movimientos.herramientas_por_recibir(datos, usuario),
+                                               codigo, datos)},
+            {"nombre": "fecha", "etiqueta": "Fecha y hora de recepción", "tipo": "fecha",
+             "defecto": fecha_web(ahora)},
+            {"nombre": "observaciones", "etiqueta": "Observaciones (opcional)", "tipo": "texto",
+             "ayuda": "Si llegó dañada, repórtelo también en 2.4 Reportar daño."},
+        ]
     if id_opcion == "2.1":
         return [
             {"nombre": "codigo", "etiqueta": "Herramienta", "tipo": "select",
@@ -277,6 +381,28 @@ def campos_de_operacion(datos, id_opcion, valores):
 def argumentos_de_operacion(datos, id_opcion, valores):
     """Convierte los valores del formulario en argumentos para validar_xxx."""
     codigo = valores.get("codigo", "")
+    if id_opcion == "1.1":
+        return {"codigo": codigo, "nombre": valores.get("nombre", ""),
+                "categoria": valores.get("categoria", ""), "marca": valores.get("marca", ""),
+                "estado": valores.get("estado", ""),
+                "motor_o_cable": valores.get("motor_o_cable") == "si",
+                "ficha_tecnica": valores.get("ficha_tecnica", ""),
+                "mantenimiento_cada_horas": leer_entero_web(valores.get("mantenimiento_cada_horas", "0"))}
+    if id_opcion == "1.2":
+        return {"codigo": codigo, "texto_apodos": valores.get("apodos", "")}
+    if id_opcion == "1.3":
+        return {"codigo": codigo, "nombre": valores.get("nombre", ""),
+                "categoria": valores.get("categoria", ""), "marca": valores.get("marca", ""),
+                "motor_o_cable": valores.get("motor_o_cable") == "si",
+                "observaciones": valores.get("observaciones", ""),
+                "estado": valores.get("estado", ""),
+                "ficha_tecnica": valores.get("ficha_tecnica", ""),
+                "mantenimiento_cada_horas": leer_entero_web(valores.get("mantenimiento_cada_horas", "0"))}
+    if id_opcion == "2.8":
+        return {"codigo": codigo, "fecha": leer_fecha_web(valores.get("fecha")),
+                "realizado_por": valores.get("realizado_por", "")}
+    if id_opcion == "2.7":
+        return {"codigo": codigo, "fecha": leer_fecha_web(valores.get("fecha"))}
     if id_opcion == "2.1":
         return {"codigo": codigo, "codigo_obra": valores.get("codigo_obra", ""),
                 "responsable": valores.get("responsable", ""),
@@ -307,15 +433,24 @@ def argumentos_de_operacion(datos, id_opcion, valores):
 
 
 VALIDAR = {
+    "1.1": herramientas.validar_registro, "1.2": herramientas.validar_apodos,
+    "1.3": herramientas.validar_modificacion, "2.7": movimientos.validar_recepcion,
+    "2.8": movimientos.validar_mantenimiento,
     "2.1": movimientos.validar_salida, "2.2": movimientos.validar_devolucion,
     "2.3": movimientos.validar_traslado, "2.4": movimientos.validar_dano,
     "2.5": movimientos.validar_revision, "2.6": movimientos.validar_permanencia,
 }
 REGISTRAR = {
+    "1.1": herramientas.registrar_herramienta, "1.2": herramientas.registrar_apodos,
+    "1.3": herramientas.registrar_modificacion, "2.7": movimientos.registrar_recepcion,
+    "2.8": movimientos.registrar_mantenimiento,
     "2.1": movimientos.registrar_salida, "2.2": movimientos.registrar_devolucion,
     "2.3": movimientos.registrar_traslado, "2.4": movimientos.registrar_dano,
     "2.5": movimientos.registrar_revision, "2.6": movimientos.registrar_permanencia,
 }
+
+# Estas opciones reciben las observaciones aparte (o no las usan) al registrar.
+OPCIONES_SIN_OBSERVACIONES_EXTRA = ["1.2", "1.3", "2.4"]
 
 
 def resumen_de_operacion(datos, id_opcion, campos, valores):
@@ -323,6 +458,8 @@ def resumen_de_operacion(datos, id_opcion, campos, valores):
     resumen = []
     for campo in campos:
         valor = valores.get(campo["nombre"], "")
+        if campo["tipo"] == "fijo":
+            valor = campo["texto"]
         if campo["tipo"] == "select":
             for opcion_valor, opcion_texto in campo["opciones"]:
                 if opcion_valor == valor:
@@ -386,7 +523,8 @@ def login():
     if request.method == "POST" and minutos == 0:
         nombre_escrito = request.form.get("usuario", "").strip()[:40]
         usuario = verificar_credenciales(datos, nombre_escrito, request.form.get("contrasena", ""))
-        if usuario is not None and PUBLICO and usuario["contrasena"] in CONTRASENAS_DE_PRUEBA:
+        if usuario is not None and PUBLICO \
+                and es_contrasena_de_demostracion(request.form.get("contrasena", "")):
             error = ("Por seguridad, las contraseñas de prueba no funcionan en la versión "
                      "publicada. El administrador debe cambiarla con cambiar_contrasena.py.")
             return render_template("login.html", error=error, minutos_bloqueo=0, avisos=avisos,
@@ -411,11 +549,6 @@ def login():
 
 # ------------------------------------------------- cuentas y propietario
 
-def es_contrasena_de_prueba(contrasena):
-    """True si es una de las contraseñas de prueba publicadas en el README."""
-    return cifrar_contrasena(contrasena) in CONTRASENAS_DE_PRUEBA
-
-
 @app.route("/configurar", methods=["GET", "POST"])
 def configurar():
     """Crea la PRIMERA cuenta de propietario con el código de configuración del servidor."""
@@ -431,7 +564,7 @@ def configurar():
     if request.method == "POST" and minutos == 0:
         valores = request.form.to_dict()
         contrasena = valores.get("contrasena", "")
-        if PUBLICO and es_contrasena_de_prueba(contrasena):
+        if PUBLICO and es_contrasena_de_demostracion(contrasena):
             error = "No use una contraseña de prueba."
         else:
             exito, mensaje = cuentas.crear_propietario_inicial(
@@ -472,7 +605,7 @@ def administrar_cuentas():
         objetivo = request.form.get("usuario", "")
         contrasena = request.form.get("contrasena", "")
         repetida = request.form.get("repetida", "")
-        if contrasena != "" and PUBLICO and es_contrasena_de_prueba(contrasena):
+        if contrasena != "" and PUBLICO and es_contrasena_de_demostracion(contrasena):
             resultado = (False, "No use una contraseña de prueba.")
         elif accion == "crear":
             valores = request.form.to_dict()
@@ -507,7 +640,7 @@ def mi_contrasena():
     resultado = None
     if request.method == "POST":
         nueva = request.form.get("nueva", "")
-        if PUBLICO and es_contrasena_de_prueba(nueva):
+        if PUBLICO and es_contrasena_de_demostracion(nueva):
             resultado = (False, "No use una contraseña de prueba.")
         else:
             resultado = cuentas.cambiar_mi_contrasena(datos, usuario, request.form.get("actual", ""),
@@ -569,18 +702,21 @@ def inicio():
         return ir_a_login()
     rapidos = []
     for id_opcion, texto in ACCESOS_RAPIDOS:
-        if tiene_permiso(usuario, id_opcion) and esta_implementada(id_opcion):
+        if tiene_permiso(usuario, id_opcion):
             rapidos.append((id_opcion, texto))
     return render_template("inicio.html", usuario=usuario, rol=NOMBRES_ROL[usuario["rol"]],
                            resumen=resumen_tablero(datos), menu=MENU_PRINCIPAL[:3],
                            avisos=avisos, rapidos=rapidos,
                            es_propietario=cuentas.es_propietario(usuario),
+                           ver_disponibles=tiene_permiso(usuario, "3.2"),
+                           ver_pendientes=tiene_permiso(usuario, "3.3"),
+                           ver_mantenimiento=tiene_permiso(usuario, "3.6"),
                            hoy=movimientos.momento_actual(None).strftime("%d/%m/%Y %H:%M"))
 
 
 @app.route("/menu/<numero>")
 def submenu(numero):
-    """Submenú 1, 2 o 3 con las marcas de permiso y pendiente."""
+    """Submenú 1, 2 o 3 con la marca de permiso."""
     datos, avisos = cargar_datos()
     usuario = usuario_actual(datos)
     if usuario is None:
@@ -591,25 +727,24 @@ def submenu(numero):
     lista = []
     for id_opcion, texto in opciones:
         lista.append({"id": id_opcion, "texto": texto,
-                      "permiso": tiene_permiso(usuario, id_opcion),
-                      "implementada": esta_implementada(id_opcion)})
+                      "permiso": tiene_permiso(usuario, id_opcion)})
     return render_template("submenu.html", usuario=usuario, rol=NOMBRES_ROL[usuario["rol"]],
                            titulo=titulo, opciones=lista, migas=[(titulo, "")])
 
 
 @app.route("/opcion/<id_opcion>")
 def opcion(id_opcion):
-    """Dirige a la funcionalidad, o avisa si no hay permiso o si está pendiente."""
+    """Dirige a la funcionalidad, o avisa si no hay permiso."""
     datos, avisos = cargar_datos()
     usuario = usuario_actual(datos)
     if usuario is None:
         return ir_a_login()
     if not tiene_permiso(usuario, id_opcion):
         return pagina_mensaje(datos, usuario, "Opción " + id_opcion, MENSAJE_SIN_PERMISO, "error")
-    if not esta_implementada(id_opcion):
-        return pagina_mensaje(datos, usuario, "Opción " + id_opcion, MENSAJE_PENDIENTE)
     if id_opcion == "3.1":
         return redirect(url_for("buscar"))
+    if id_opcion.startswith("3."):
+        return redirect(url_for("consulta", id_opcion=id_opcion, **request.args.to_dict()))
     return redirect(url_for("operacion", id_opcion=id_opcion, **request.args.to_dict()))
 
 
@@ -627,6 +762,13 @@ def acciones_de_herramienta(usuario, herramienta):
         acciones.append(("2.4", "Reportar daño"))
     if movimientos.motivo_bloqueo_revision(herramienta) == "":
         acciones.append(("2.5", "Registrar revisión"))
+    if movimientos.motivo_bloqueo_recepcion(usuario, herramienta) == "":
+        acciones.append(("2.7", "Confirmar que llegó"))
+    if movimientos.motivo_bloqueo_mantenimiento(herramienta) == "":
+        acciones.append(("2.8", "Registrar mantenimiento"))
+    acciones.append(("3.5", "Ver historial"))
+    acciones.append(("1.2", "Asociar apodos"))
+    acciones.append(("1.3", "Modificar"))
     permitidas = []
     for id_opcion, texto_accion in acciones:
         if tiene_permiso(usuario, id_opcion):
@@ -657,7 +799,7 @@ def buscar():
                            migas=[("3.1 Buscar herramienta", "")])
 
 
-@app.route("/movimientos/<id_opcion>", methods=["GET", "POST"])
+@app.route("/operacion/<id_opcion>", methods=["GET", "POST"])
 def operacion(id_opcion):
     """Formulario -> confirmación (¿Confirmar operación?) -> resultado."""
     datos, avisos = cargar_datos()
@@ -665,28 +807,31 @@ def operacion(id_opcion):
     if usuario is None:
         return ir_a_login()
     if id_opcion not in VALIDAR:
-        return pagina_mensaje(datos, usuario, "Movimientos", "Opción no válida, intente de nuevo.",
+        return pagina_mensaje(datos, usuario, "Operación", "Opción no válida, intente de nuevo.",
                               "error")
     if not tiene_permiso(usuario, id_opcion):
         return pagina_mensaje(datos, usuario, "Opción " + id_opcion, MENSAJE_SIN_PERMISO, "error")
+    numero_menu = id_opcion[0]
     titulo = ""
-    for id_sub, texto in SUBMENUS["2"][1]:
+    for id_sub, texto in SUBMENUS[numero_menu][1]:
         if id_sub == id_opcion:
             titulo = id_opcion + " " + texto
-    migas = [(SUBMENUS["2"][0], url_for("submenu", numero="2")), (titulo, "")]
+    migas = [(SUBMENUS[numero_menu][0], url_for("submenu", numero=numero_menu)), (titulo, "")]
     if request.method == "GET":
         valores = request.args.to_dict()
     else:
         valores = request.form.to_dict()
     valores.pop("token", None)
-    campos = campos_de_operacion(datos, id_opcion, valores)
+    campos = campos_de_operacion(datos, usuario, id_opcion, valores)
     paso = valores.pop("paso", "")
+    # En 1.3, sin una herramienta elegida el formulario solo pide elegirla.
+    solo_elegir = id_opcion == "1.3" and obtener_herramienta(datos, valores.get("codigo", "")) is None
 
     if paso == "cancelar":
         return pagina_mensaje(datos, usuario, titulo, movimientos.MENSAJE_CANCELADO)
 
     errores = []
-    if paso in ["revisar", "guardar"]:
+    if paso in ["revisar", "guardar"] and not solo_elegir:
         argumentos = argumentos_de_operacion(datos, id_opcion, valores)
         errores = VALIDAR[id_opcion](datos, usuario, **argumentos)
         if len(errores) == 0 and paso == "revisar":
@@ -695,7 +840,7 @@ def operacion(id_opcion):
                                    id_opcion=id_opcion, valores=valores, migas=migas,
                                    resumen=resumen_de_operacion(datos, id_opcion, campos, valores))
         if len(errores) == 0 and paso == "guardar":
-            if id_opcion != "2.4":
+            if id_opcion not in OPCIONES_SIN_OBSERVACIONES_EXTRA:
                 argumentos["observaciones"] = valores.get("observaciones", "")
             exito, mensaje = REGISTRAR[id_opcion](datos, usuario, **argumentos)
             if exito:
@@ -705,13 +850,113 @@ def operacion(id_opcion):
             return render_template("resultado.html", usuario=usuario,
                                    rol=NOMBRES_ROL[usuario["rol"]], titulo=titulo, exito=exito,
                                    mensaje=mensaje, id_opcion=id_opcion, migas=migas,
-                                   codigo=valores.get("codigo", ""), ofrecer_dano=ofrecer_dano)
+                                   codigo=valores.get("codigo", "").strip().upper(),
+                                   ofrecer_dano=ofrecer_dano)
 
     for campo in campos:
         campo["valor"] = valores.get(campo["nombre"], campo.get("defecto", ""))
     return render_template("formulario.html", usuario=usuario, rol=NOMBRES_ROL[usuario["rol"]],
                            titulo=titulo, id_opcion=id_opcion, campos=campos, errores=errores,
-                           personal=PERSONAL, migas=migas)
+                           personal=PERSONAL, migas=migas, numero_menu=numero_menu,
+                           categorias=consultas.categorias(datos), solo_elegir=solo_elegir)
+
+
+# ---------------------------------------------------------- ficha técnica
+
+@app.route("/ficha/<codigo>", methods=["GET", "POST"])
+def ficha(codigo):
+    """Muestra la ficha técnica; bodega y propietario pueden subir el archivo."""
+    datos, avisos = cargar_datos()
+    usuario = usuario_actual(datos)
+    if usuario is None:
+        return ir_a_login()
+    herramienta = obtener_herramienta(datos, codigo)
+    if herramienta is None:
+        return pagina_mensaje(datos, usuario, "Ficha técnica",
+                              "La herramienta '" + codigo + "' no existe en el catálogo.", "error")
+    resultado = None
+    if request.method == "POST":
+        archivo = request.files.get("archivo")
+        contenido = archivo.read() if archivo is not None else b""
+        resultado = herramientas.guardar_archivo_ficha(datos, usuario, herramienta["codigo"], contenido)
+        if resultado[0]:
+            guardar_datos(datos)
+    return render_template("ficha.html", usuario=usuario, rol=NOMBRES_ROL[usuario["rol"]],
+                           titulo="Ficha técnica", herramienta=herramienta, resultado=resultado,
+                           uso=movimientos.texto_de_uso(herramienta),
+                           puede_editar=tiene_permiso(usuario, "1.3"),
+                           migas=[("Ficha técnica de " + herramienta["codigo"], "")])
+
+
+@app.route("/ficha/<codigo>/archivo")
+def ficha_archivo(codigo):
+    """Entrega el archivo de la ficha técnica a quien tiene sesión iniciada."""
+    datos, avisos = cargar_datos()
+    usuario = usuario_actual(datos)
+    if usuario is None:
+        return ir_a_login()
+    herramienta = obtener_herramienta(datos, codigo)
+    if herramienta is None or not herramienta.get("ficha_archivo"):
+        return pagina_mensaje(datos, usuario, "Ficha técnica",
+                              "Esta herramienta no tiene archivo de ficha técnica.", "error")
+    return send_from_directory(herramientas.carpeta_fichas(), herramienta["ficha_archivo"])
+
+
+# --------------------------------------------------------------- consultas
+
+@app.route("/consulta/<id_opcion>")
+def consulta(id_opcion):
+    """Consultas 3.2 a 3.5: solo leen los datos y muestran el resultado."""
+    datos, avisos = cargar_datos()
+    usuario = usuario_actual(datos)
+    if usuario is None:
+        return ir_a_login()
+    if id_opcion not in ["3.2", "3.3", "3.4", "3.5", "3.6"]:
+        return pagina_mensaje(datos, usuario, "Consultas", "Opción no válida, intente de nuevo.",
+                              "error")
+    if not tiene_permiso(usuario, id_opcion):
+        return pagina_mensaje(datos, usuario, "Opción " + id_opcion, MENSAJE_SIN_PERMISO, "error")
+    titulo = ""
+    for id_sub, texto in SUBMENUS["3"][1]:
+        if id_sub == id_opcion:
+            titulo = id_opcion + " " + texto
+    comunes = {"usuario": usuario, "rol": NOMBRES_ROL[usuario["rol"]], "titulo": titulo,
+               "migas": [(SUBMENUS["3"][0], url_for("submenu", numero="3")), (titulo, "")]}
+    if id_opcion == "3.6":
+        return render_template("mantenimiento.html", lista=consultas.consultar_mantenimiento(datos),
+                               puede_registrar=tiene_permiso(usuario, "2.8"), **comunes)
+    if id_opcion == "3.2":
+        criterio = request.args.get("criterio", "").strip()[:60]
+        return render_template("disponibles.html", criterio=criterio,
+                               categorias=consultas.categorias(datos),
+                               lista=consultas.consultar_disponibles(datos, criterio), **comunes)
+    if id_opcion == "3.3":
+        ver = request.args.get("ver", "todas")
+        texto_hasta = request.args.get("hasta", "")
+        hasta = leer_fecha_web(texto_hasta)
+        error = "Fecha inválida. Elija una fecha de la lista." if texto_hasta != "" and hasta is None else ""
+        return render_template("pendientes.html", ver=ver, texto_hasta=texto_hasta, error=error,
+                               lista=consultas.consultar_pendientes(datos, ver == "vencidas", hasta),
+                               **comunes)
+    if id_opcion == "3.4":
+        codigo_obra = request.args.get("obra", "")
+        if usuario["rol"] == "maestro":
+            codigo_obra = usuario.get("obra", "")
+        error = ""
+        lista = []
+        if codigo_obra != "":
+            error = consultas.error_en_consulta_por_obra(datos, usuario, codigo_obra)
+            if error == "":
+                lista = consultas.consultar_por_obra(datos, codigo_obra)
+        return render_template("por_obra.html", codigo_obra=codigo_obra, error=error, lista=lista,
+                               obras=opciones_obras(datos), es_maestro=usuario["rol"] == "maestro",
+                               nombre=nombre_obra(datos, codigo_obra), **comunes)
+    codigo = request.args.get("codigo", "")
+    historial = consultas.consultar_historial(datos, codigo) if codigo != "" else None
+    return render_template("historial.html", codigo=codigo, historial=historial,
+                           nombres=consultas.NOMBRES_MOVIMIENTO,
+                           opciones=opciones_herramientas(datos["herramientas"], "", datos),
+                           **comunes)
 
 
 if __name__ == "__main__":

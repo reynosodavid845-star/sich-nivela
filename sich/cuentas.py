@@ -9,7 +9,7 @@ import os
 import secrets
 
 from sich.autenticacion import NOMBRES_ROL
-from sich.datos import CARPETA_DATOS, cifrar_contrasena
+from sich.datos import CARPETA_DATOS, cifrar_contrasena, contrasena_correcta
 from sich.catalogo import obras_activas
 
 MINIMO_CONTRASENA = 8
@@ -124,7 +124,7 @@ def cambiar_estado(datos, propietario, nombre_usuario, activo):
 
 def cambiar_mi_contrasena(datos, usuario, actual, nueva, repetida):
     """Cualquier usuario cambia su propia contraseña, sabiendo la actual."""
-    if usuario["contrasena"] != cifrar_contrasena(actual):
+    if not contrasena_correcta(actual, usuario["contrasena"]):
         return False, "La contraseña actual no es correcta."
     error = error_en_contrasena(nueva, repetida)
     if error != "":

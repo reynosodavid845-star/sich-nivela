@@ -1,8 +1,7 @@
-"""Módulo 1 - Catálogo de herramientas.
+"""Lecturas del catálogo de herramientas y obras.
 
-Las funcionalidades 1.1 Registrar, 1.2 Asociar apodos y 1.3 Modificar quedan
-pendientes para la Fase 4. Aquí solo están las funciones de lectura que
-necesita el Módulo 2 (obtener herramientas y obras de los datos de prueba).
+Las usan todos los módulos. El registro y la modificación de herramientas
+(Módulo 1) están en herramientas.py.
 """
 
 ESTADOS = ["disponible", "asignada", "dañada", "en reparación", "requiere revisión",

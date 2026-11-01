@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block contenido %}
+<h1>{{ titulo }}</h1>
+<form method="get" class="tarjeta formulario">
+  <label for="criterio">Categoría, nombre o apodo (vacío = todas)</label>
+  <input id="criterio" name="criterio" value="{{ criterio }}" list="lista-categorias" maxlength="60" autocomplete="off">
+  <datalist id="lista-categorias">{% for categoria in categorias %}<option value="{{ categoria }}">{% endfor %}</datalist>
+  <button class="boton-grande" type="submit">Consultar</button>
+</form>
+{% if lista %}
+  <p class="suave" role="status">{{ lista|length }} disponible(s) en bodega{% if criterio %} para "{{ criterio }}"{% endif %}</p>
+  <div class="resultados">
+  {% for h in lista %}
+    <article class="tarjeta">
+      <h2>{{ h.codigo }} · {{ h.nombre }} <span class="etiqueta estado-disponible">DISPONIBLE</span></h2>
+      <dl>
+        <dt>Categoría</dt><dd>{{ h.categoria }}</dd>
+        <dt>Marca</dt><dd>{{ h.marca }}</dd>
+        <dt>También le dicen</dt><dd>{{ h.apodos|join(', ') or '-' }}</dd>
+      </dl>
+      {% if usuario.rol in ['bodega', 'propietario'] %}<a class="boton" href="{{ url_for('opcion', id_opcion='2.1', codigo=h.codigo) }}">Sacar a obra</a>{% endif %}
+    </article>
+  {% endfor %}
+  </div>
+{% else %}
+  <p class="alerta aviso" role="status">No hay herramientas disponibles{% if criterio %} para "{{ criterio }}"{% endif %}.</p>
+{% endif %}
+<a class="boton-grande secundario" href="{{ url_for('submenu', numero='3') }}">Regresar</a>
+{% endblock %}
